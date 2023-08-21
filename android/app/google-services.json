@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "242536110981",
+    "project_id": "absensi-sinarindo",
+    "storage_bucket": "absensi-sinarindo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:242536110981:android:9d671f9a6ad24c74a9c2ec",
+        "android_client_info": {
+          "package_name": "com.example.absensi_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "242536110981-pbm6tam4ecou0qaseh1psb0vjcvabfnd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUs-pjMsqUbSObWOjmmGr_H7W2RFwew8g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "242536110981-pbm6tam4ecou0qaseh1psb0vjcvabfnd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
