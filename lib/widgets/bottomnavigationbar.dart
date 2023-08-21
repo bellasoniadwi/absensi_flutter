@@ -45,31 +45,31 @@ class _BottomState extends State<Bottom> {
                   color: index_color == 0 ? Color(0xFF1A73E8) : Colors.grey,
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    index_color = 1;
-                  });
-                },
-                child: Icon(
-                  Icons.bar_chart_outlined,
-                  size: 30,
-                  color: index_color == 1 ? Color(0xff368983) : Colors.grey,
-                ),
-              ),
+              // GestureDetector(
+              //   onTap: () {
+              //     setState(() {
+              //       index_color = 1;
+              //     });
+              //   },
+              //   child: Icon(
+              //     Icons.bar_chart_outlined,
+              //     size: 30,
+              //     color: index_color == 1 ? Color(0xFF1A73E8) : Colors.grey,
+              //   ),
+              // ),
               SizedBox(width: 10),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    index_color = 2;
-                  });
-                },
-                child: Icon(
-                  Icons.account_balance_wallet_outlined,
-                  size: 30,
-                  color: index_color == 2 ? Color(0xff368983) : Colors.grey,
-                ),
-              ),
+              // GestureDetector(
+              //   onTap: () {
+              //     setState(() {
+              //       index_color = 2;
+              //     });
+              //   },
+              //   child: Icon(
+              //     Icons.account_balance_wallet_outlined,
+              //     size: 30,
+              //     color: index_color == 2 ? Color(0xFF1A73E8) : Colors.grey,
+              //   ),
+              // ),
               GestureDetector(
                 onTap: () {
                   setState(() {
@@ -79,7 +79,7 @@ class _BottomState extends State<Bottom> {
                 child: Icon(
                   Icons.person_outlined,
                   size: 30,
-                  color: index_color == 3 ? Color(0xff368983) : Colors.grey,
+                  color: index_color == 3 ? Color(0xFF1A73E8) : Colors.grey,
                 ),
               ),
             ],
