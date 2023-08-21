@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:absensi_flutter/data/model/add_date.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class Add_Screen extends StatefulWidget {
   const Add_Screen({super.key});
@@ -10,35 +16,16 @@ class Add_Screen extends StatefulWidget {
 }
 
 class _Add_ScreenState extends State<Add_Screen> {
-  final box = Hive.box<Add_data>('data');
-  DateTime date = new DateTime.now();
-  String? selctedItem;
-  String? selctedItemi;
-  final TextEditingController expalin_C = TextEditingController();
-  FocusNode ex = FocusNode();
-  final TextEditingController amount_c = TextEditingController();
-  FocusNode amount_ = FocusNode();
-  final List<String> _item = [
-    'food',
-    "Transfer",
-    "Transportation",
-    "Education"
-  ];
-  final List<String> _itemei = [
-    'Income',
-    "Expand",
-  ];
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    ex.addListener(() {
-      setState(() {});
-    });
-    amount_.addListener(() {
-      setState(() {});
-    });
-  }
+  final CollectionReference _karyawan =
+      FirebaseFirestore.instance.collection('karyawans');
+  final TextEditingController _nameController = TextEditingController();
+  DateTime selectedDate = DateTime.now();
+  String imageUrl = '';
+  String _imagePath = '';
+  bool _isSaving = false;
+
+  String? _selectedValue;
+  List<String> listOfValue = ['Masuk', 'Izin', 'Sakit'];
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,21 +51,32 @@ class _Add_ScreenState extends State<Add_Screen> {
         borderRadius: BorderRadius.circular(20),
         color: Colors.white,
       ),
-      height: 550,
+      height: 700,
       width: 340,
       child: Column(
         children: [
-          SizedBox(height: 50),
-          name(),
+          SizedBox(height: 40),
+          nama(),
           SizedBox(height: 30),
-          explain(),
+          keterangan(),
           SizedBox(height: 30),
-          amount(),
+          foto(),
+          SizedBox(height: 20),
+          if (_imagePath.isNotEmpty)
+            Center(
+              child: Container(
+                height: 250,
+                width: 170,
+                child: _imagePath != ''
+                    ? Image.file(
+                        File(_imagePath),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+            ),
+          // Spacer(),
           SizedBox(height: 30),
-          How(),
-          SizedBox(height: 30),
-          date_time(),
-          Spacer(),
           save(),
           SizedBox(height: 25),
         ],
@@ -88,64 +86,139 @@ class _Add_ScreenState extends State<Add_Screen> {
 
   GestureDetector save() {
     return GestureDetector(
-      onTap: () {
-        var add = Add_data(
-            selctedItemi!, amount_c.text, date, expalin_C.text, selctedItem!);
-        box.add(add);
-        Navigator.of(context).pop();
-      },
+      onTap: _isSaving // Prevent button press when loading
+          ? null // Button is disabled when loading
+          : () async {
+              setState(() {
+                _isSaving = true; // Aktifkan indikator loading
+              });
+
+              final String name = _nameController.text;
+              final String keterangan = _selectedValue.toString();
+
+              // Get current latitude and longitude
+              _currentLocation = await _getCurrentLocation();
+              final String latitude = _currentLocation!.latitude.toString();
+              final String longitude = _currentLocation!.longitude.toString();
+
+              if (_imagePath.isEmpty) {
+                // Ganti imageUrl.isEmpty menjadi _imagePath.isEmpty
+                setState(() {
+                  _isSaving =
+                      false; // Matikan indikator loading setelah selesai
+                });
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Upload Foto Absen Anda'),
+                  backgroundColor: Colors.blueAccent,
+                ));
+                return;
+              }
+
+              if (keterangan == "Masuk" ||
+                  keterangan == "Izin" ||
+                  keterangan == "Sakit") {
+                Uint8List imageBytes = await File(_imagePath).readAsBytes();
+                String uniqueFileName =
+                    DateTime.now().millisecondsSinceEpoch.toString();
+                String formattedDateTime =
+                    DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+                String fileName = 'images/' +
+                    uniqueFileName +
+                    '_' +
+                    formattedDateTime +
+                    '.jpg';
+                Reference referenceImageToUpload =
+                    FirebaseStorage.instance.ref().child(fileName);
+                await referenceImageToUpload.putData(imageBytes);
+
+                String imageUrl = await referenceImageToUpload.getDownloadURL();
+
+                // Generate custom id : increment
+                String docId = DateTime.now().millisecondsSinceEpoch.toString();
+                // Create a reference to the document using the custom ID
+                DocumentReference documentReference = _karyawan.doc(docId);
+
+                await documentReference.set({
+                  "name": name,
+                  "timestamps": FieldValue.serverTimestamp(),
+                  "image": imageUrl,
+                  "latitude": latitude,
+                  "longitude": longitude,
+                  "keterangan": keterangan,
+                });
+
+                setState(() {
+                  _isSaving =
+                      false; // Matikan indikator loading setelah selesai
+                });
+
+                _nameController.text = '';
+                _imagePath = '';
+
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Data Absensi anda berhasil tersimpan'),
+                  backgroundColor: Colors.blueAccent,
+                ));
+                Navigator.pop(context);
+              } else {
+                setState(() {
+                  _isSaving =
+                      false; // Matikan indikator loading setelah selesai
+                });
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Masukkan keterangan kehadiran'),
+                  backgroundColor: Colors.blueAccent,
+                ));
+              }
+            },
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
-          color: Color(0xff368983),
+          color: Color(0xFF1A73E8),
         ),
         width: 120,
         height: 50,
-        child: Text(
-          'Save',
-          style: TextStyle(
-            fontFamily: 'f',
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-            fontSize: 17,
-          ),
+        child: _isSaving
+            ? CircularProgressIndicator(
+                // Tampilkan indikator loading
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+              )
+            : Text(
+                'Simpan Data',
+                style: TextStyle(
+                  fontFamily: 'f',
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  fontSize: 17,
+                ),
+              ),
+      ),
+    );
+  }
+
+  Padding nama() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: TextField(
+        controller: _nameController,
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          labelText: 'Nama',
+          labelStyle: TextStyle(fontSize: 17, color: Colors.grey.shade500),
+          enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(width: 2, color: Color(0xffC5C5C5))),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(width: 2, color: Color(0xFF1A73E8))),
         ),
       ),
     );
   }
 
-  Widget date_time() {
-    return Container(
-      alignment: Alignment.bottomLeft,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(width: 2, color: Color(0xffC5C5C5))),
-      width: 300,
-      child: TextButton(
-        onPressed: () async {
-          DateTime? newDate = await showDatePicker(
-              context: context,
-              initialDate: date,
-              firstDate: DateTime(2020),
-              lastDate: DateTime(2100));
-          if (newDate == Null) return;
-          setState(() {
-            date = newDate!;
-          });
-        },
-        child: Text(
-          'Date : ${date.year} / ${date.day} / ${date.month}',
-          style: TextStyle(
-            fontSize: 15,
-            color: Colors.black,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Padding How() {
+  Padding keterangan() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Container(
@@ -159,13 +232,13 @@ class _Add_ScreenState extends State<Add_Screen> {
           ),
         ),
         child: DropdownButton<String>(
-          value: selctedItemi,
+          value: _selectedValue,
           onChanged: ((value) {
             setState(() {
-              selctedItemi = value!;
+              _selectedValue = value as String?;
             });
           }),
-          items: _itemei
+          items: listOfValue
               .map((e) => DropdownMenuItem(
                     child: Container(
                       alignment: Alignment.center,
@@ -181,7 +254,7 @@ class _Add_ScreenState extends State<Add_Screen> {
                     value: e,
                   ))
               .toList(),
-          selectedItemBuilder: (BuildContext context) => _itemei
+          selectedItemBuilder: (BuildContext context) => listOfValue
               .map((e) => Row(
                     children: [Text(e)],
                   ))
@@ -189,7 +262,7 @@ class _Add_ScreenState extends State<Add_Screen> {
           hint: Padding(
             padding: const EdgeInsets.only(top: 12),
             child: Text(
-              'How',
+              'Pilih Keterangan',
               style: TextStyle(color: Colors.grey),
             ),
           ),
@@ -201,112 +274,33 @@ class _Add_ScreenState extends State<Add_Screen> {
     );
   }
 
-  Padding amount() {
+  Padding foto() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: TextField(
-        keyboardType: TextInputType.number,
-        focusNode: amount_,
-        controller: amount_c,
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-          labelText: 'amount',
-          labelStyle: TextStyle(fontSize: 17, color: Colors.grey.shade500),
-          enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(width: 2, color: Color(0xffC5C5C5))),
-          focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(width: 2, color: Color(0xff368983))),
-        ),
-      ),
-    );
-  }
-
-  Padding explain() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: TextField(
-        focusNode: ex,
-        controller: expalin_C,
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-          labelText: 'explain',
-          labelStyle: TextStyle(fontSize: 17, color: Colors.grey.shade500),
-          enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(width: 2, color: Color(0xffC5C5C5))),
-          focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(width: 2, color: Color(0xff368983))),
-        ),
-      ),
-    );
-  }
-
-  Padding name() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        width: 300,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            width: 2,
-            color: Color(0xffC5C5C5),
-          ),
-        ),
-        child: DropdownButton<String>(
-          value: selctedItem,
-          onChanged: ((value) {
-            setState(() {
-              selctedItem = value!;
-            });
-          }),
-          items: _item
-              .map((e) => DropdownMenuItem(
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            child: Image.asset('images/${e}.png'),
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            e,
-                            style: TextStyle(fontSize: 18),
-                          )
-                        ],
-                      ),
-                    ),
-                    value: e,
-                  ))
-              .toList(),
-          selectedItemBuilder: (BuildContext context) => _item
-              .map((e) => Row(
-                    children: [
-                      Container(
-                        width: 42,
-                        child: Image.asset('images/${e}.png'),
-                      ),
-                      SizedBox(width: 5),
-                      Text(e)
-                    ],
-                  ))
-              .toList(),
-          hint: Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Text(
-              'Name',
-              style: TextStyle(color: Colors.grey),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          primary: Colors.blueAccent,
+          minimumSize: const Size.fromHeight(50),
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              color: Colors.blueAccent,
+              width: 2.0,
             ),
+            borderRadius: BorderRadius.circular(4), // Atur sesuai kebutuhan
           ),
-          dropdownColor: Colors.white,
-          isExpanded: true,
-          underline: Container(),
+        ),
+        onPressed: () => _pickAndSetImage(),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.camera_alt, color: Colors.white), // Icon added here
+            SizedBox(width: 10), // Add some spacing between the icon and text
+            Text(
+              'Ambil Foto',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
     );
@@ -319,7 +313,7 @@ class _Add_ScreenState extends State<Add_Screen> {
           width: double.infinity,
           height: 240,
           decoration: BoxDecoration(
-            color: Color(0xff368983),
+            color: Color(0xFF1A73E8),
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(20),
               bottomRight: Radius.circular(20),
@@ -341,7 +335,7 @@ class _Add_ScreenState extends State<Add_Screen> {
                       child: Icon(Icons.arrow_back, color: Colors.white),
                     ),
                     Text(
-                      'Adding',
+                      'Form Absensi',
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -359,5 +353,41 @@ class _Add_ScreenState extends State<Add_Screen> {
         ),
       ],
     );
+  }
+
+  // FUNGSI - FUNGSI
+  // Fungsi Pick Image tanpa menyimpan ke Firebase
+  Future<void> _pickAndSetImage() async {
+    ImagePicker imagePicker = ImagePicker();
+    XFile? file = await imagePicker.pickImage(source: ImageSource.camera);
+    if (file == null) return;
+    setState(() {
+      _imagePath = file.path;
+    });
+  }
+
+  // Fungsi Pembantu Image untuk mengatur imageUrl dengan menggunakan setState.
+  void _setImageUrl(String imageUrl) {
+    setState(() {
+      this.imageUrl = imageUrl;
+    });
+  }
+
+  // Komponen Pengambilan Lokasi Saat Ini
+  Position? _currentLocation;
+  late bool servicePermission = false;
+  late LocationPermission permission;
+  Future<Position> _getCurrentLocation() async {
+    // check if we have permission to access location service
+    servicePermission = await Geolocator.isLocationServiceEnabled();
+    if (!servicePermission) {
+      print("Service Disabled");
+    }
+    // service enabled
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    return await Geolocator.getCurrentPosition();
   }
 }
