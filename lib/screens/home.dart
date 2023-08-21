@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:absensi_flutter/data/listdata.dart';
 import 'package:absensi_flutter/data/model/add_date.dart';
 import 'package:absensi_flutter/data/utlity.dart';
+import 'package:intl/intl.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -13,110 +15,122 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var history;
-  final box = Hive.box<Add_data>('data');
-  final List<String> day = [
-    'Monday',
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    'friday',
-    'saturday',
-    'sunday'
-  ];
+  final CollectionReference _karyawan =
+      FirebaseFirestore.instance.collection('karyawans');
+  DateTime selectedDate = DateTime.now();
+  String imageUrl = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-          child: ValueListenableBuilder(
-              valueListenable: box.listenable(),
-              builder: (context, value, child) {
-                return CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: SizedBox(height: 340, child: _head()),
-                    ),
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Transactions History',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 19,
-                                color: Colors.black,
+      body: StreamBuilder(
+          stream: _karyawan.snapshots(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
+            if (streamSnapshot.hasData) {
+              return SafeArea(
+                  child: ValueListenableBuilder(
+                      valueListenable: box.listenable(),
+                      builder: (context, value, child) {
+                        return CustomScrollView(
+                          slivers: [
+                            SliverToBoxAdapter(
+                              child: SizedBox(height: 340, child: _header()),
+                            ),
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Riwayat Absensi',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 19,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    Text(
+                                      'See all',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            Text(
-                              'See all',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                                color: Colors.grey,
+                            SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final reversedIndex =
+                                      streamSnapshot.data!.docs.length -
+                                          1 -
+                                          index;
+                                  final DocumentSnapshot documentSnapshot =
+                                      streamSnapshot.data!.docs[reversedIndex];
+
+                                  return Dismissible(
+                                      key: UniqueKey(),
+                                      onDismissed: (direction) {},
+                                      child: ListTile(
+                                        leading: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Image.network(
+                                            documentSnapshot['image'],
+                                            width: 60,
+                                            height: 80,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        title: Text(
+                                          documentSnapshot['name'],
+                                          style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          _getFormattedTimestamp(
+                                              documentSnapshot['timestamps']),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        trailing: Text(
+                                          documentSnapshot['keterangan'],
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 19,
+                                            color: documentSnapshot[
+                                                        'keterangan'] ==
+                                                    'Masuk'
+                                                ? Colors.green
+                                                : Colors.red,
+                                          ),
+                                        ),
+                                      ));
+                                },
+                                childCount: streamSnapshot.data!.docs.length,
                               ),
-                            ),
+                            )
                           ],
-                        ),
-                      ),
-                    ),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          history = box.values.toList()[index];
-                          return getList(history, index);
-                        },
-                        childCount: box.length,
-                      ),
-                    )
-                  ],
-                );
-              })),
+                        );
+                      }));
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }),
     );
   }
 
-  Widget getList(Add_data history, int index) {
-    return Dismissible(
-        key: UniqueKey(),
-        onDismissed: (direction) {
-          history.delete();
-        },
-        child: get(index, history));
-  }
-
-  ListTile get(int index, Add_data history) {
-    return ListTile(
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(5),
-        child: Image.asset('images/${history.name}.png', height: 40),
-      ),
-      title: Text(
-        history.name,
-        style: TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      subtitle: Text(
-        '${day[history.datetime.weekday - 1]}  ${history.datetime.year}-${history.datetime.day}-${history.datetime.month}',
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      trailing: Text(
-        history.amount,
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 19,
-          color: history.IN == 'Income' ? Colors.green : Colors.red,
-        ),
-      ),
-    );
-  }
-
-  Widget _head() {
+  Widget _header() {
     return Stack(
       children: [
         Column(
@@ -143,7 +157,7 @@ class _HomeState extends State<Home> {
                         width: 40,
                         color: Color.fromRGBO(250, 250, 250, 0.1),
                         child: Icon(
-                          Icons.notification_add_outlined,
+                          Icons.logout,
                           size: 30,
                           color: Colors.white,
                         ),
@@ -156,7 +170,7 @@ class _HomeState extends State<Home> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Good afternoon',
+                          'Welcome,',
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 16,
@@ -320,5 +334,18 @@ class _HomeState extends State<Home> {
         )
       ],
     );
+  }
+
+  String _getFormattedTimestamp(Timestamp? timestamp) {
+    if (timestamp == null) {
+      // Handle the case when 'timestamps' is null, set a default value or return an empty string
+      return 'No Timestamp';
+    }
+    // Convert the Timestamp to DateTime
+    DateTime dateTime = timestamp.toDate();
+    // Format the DateTime as a human-readable string (change the format as desired)
+    String formattedDateTime =
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+    return formattedDateTime;
   }
 }
