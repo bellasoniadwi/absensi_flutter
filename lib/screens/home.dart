@@ -1,11 +1,13 @@
+import 'package:absensi_flutter/auth/signin_screen.dart';
+import 'package:absensi_flutter/models/user_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:absensi_flutter/data/listdata.dart';
-import 'package:absensi_flutter/data/model/add_date.dart';
 import 'package:absensi_flutter/data/utlity.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -19,6 +21,36 @@ class _HomeState extends State<Home> {
       FirebaseFirestore.instance.collection('karyawans');
   DateTime selectedDate = DateTime.now();
   String imageUrl = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserDataFromFirestore();
+  }
+
+  Future<void> fetchUserDataFromFirestore() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Ambil data pengguna dari Firestore berdasarkan UID
+        var userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+        if (userDoc.exists) {
+          String name = userDoc.data()?['name'] ?? 'Guest';
+          String email = userDoc.data()?['email'] ?? 'guest@example.com';
+          String jabatan = userDoc.data()?['jabatan'] ?? 'Jabatan';
+          String image = userDoc.data()?['image'] ?? 'https://img.freepik.com/free-icon/user_318-159711.jpg';
+          String nomor_induk = userDoc.data()?['nomor_induk'] ?? 'Nomor Induk';
+          Provider.of<UserData>(context, listen: false)
+              .updateUserData(name, email, jabatan, image, nomor_induk);
+        }
+      }
+    } catch (error) {
+      print("Error fetching user data: $error");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +163,10 @@ class _HomeState extends State<Home> {
   }
 
   Widget _header() {
+    final userData = Provider.of<UserData>(context);
+
+    // Dapatkan data Nama dan Email dari variabel global
+    final String accountName = userData.name ?? 'Guest';
     return Stack(
       children: [
         Column(
@@ -156,10 +192,20 @@ class _HomeState extends State<Home> {
                         height: 40,
                         width: 40,
                         color: Color.fromRGBO(250, 250, 250, 0.1),
-                        child: Icon(
-                          Icons.logout,
-                          size: 30,
-                          color: Colors.white,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.logout,
+                            color: Colors.white,
+                          ),
+                          onPressed: () async {
+                            await FirebaseAuth.instance.signOut();
+                            final SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            prefs.remove('isLoggedIn'); // Hapus status login saat logout
+                            print("Signed Out");
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) => SignInScreen()));
+                          },
                         ),
                       ),
                     ),
@@ -178,7 +224,7 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                         Text(
-                          'Enjelin Morgeana',
+                          '$accountName',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 20,

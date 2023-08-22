@@ -1,12 +1,15 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:absensi_flutter/models/user_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class Add_Screen extends StatefulWidget {
   const Add_Screen({super.key});
@@ -26,6 +29,31 @@ class _Add_ScreenState extends State<Add_Screen> {
 
   String? _selectedValue;
   List<String> listOfValue = ['Masuk', 'Izin', 'Sakit'];
+
+  void initState() {
+    super.initState();
+    fetchUserDataFromFirestore();
+  }
+
+  Future<void> fetchUserDataFromFirestore() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        var userDoc =  await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          String name = userDoc.data()?['name'] ?? '';
+          String email = userDoc.data()?['email'] ?? '';
+          String jabatan = userDoc.data()?['jabatan'] ?? '';
+          String image = userDoc.data()?['image'] ?? '';
+          String nomor_induk = userDoc.data()?['nomor_induk'] ?? '';
+          _nameController.text = name;
+          Provider.of<UserData>(context, listen: false).updateUserData(name, email, jabatan, image, nomor_induk);
+        }
+      }
+    } catch (error) {
+      print("Error fetching user data: $error");
+    }
+  }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -214,6 +242,7 @@ class _Add_ScreenState extends State<Add_Screen> {
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(width: 2, color: Color(0xFF1A73E8))),
         ),
+        enabled: false,
       ),
     );
   }

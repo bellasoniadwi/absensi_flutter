@@ -1,7 +1,11 @@
+import 'package:absensi_flutter/auth/signin_screen.dart';
+import 'package:absensi_flutter/models/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:absensi_flutter/widgets/bottomnavigationbar.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'data/model/add_date.dart';
 
 void main() async {
@@ -10,17 +14,29 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(AdddataAdapter());
   await Hive.openBox<Add_data>('data');
-  runApp(const MyApp());
+  final bool isLoggedIn = await checkLoggedInStatus();
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final bool isLoggedIn;
+  const MyApp({required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UserData()),
+      ], 
+      child: MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Bottom(),
+      home: isLoggedIn ? Bottom() : SignInScreen(),
+    )
     );
   }
+}
+
+Future<bool> checkLoggedInStatus() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('isLoggedIn') ?? false;
 }
