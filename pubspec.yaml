@@ -116,4 +116,4 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: 'images/sgs.png'
+  image_path: 'images/sinarindo.png'
