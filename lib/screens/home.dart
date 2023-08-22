@@ -24,12 +24,18 @@ class _HomeState extends State<Home> {
   DateTime selectedDate = DateTime.now();
   String imageUrl = '';
   String? _userName;
+  int totalMasuk = 0;
+  int totalIzin = 0;
+  int totalSakit = 0;
 
   @override
   void initState() {
     super.initState();
     initializeDateFormatting("id_ID", null);
     fetchUserDataFromFirestore();
+    fetchTotalMasuk();
+    fetchTotalIzin();
+    fetchTotalSakit();
   }
 
   Future<void> fetchUserDataFromFirestore() async {
@@ -59,6 +65,48 @@ class _HomeState extends State<Home> {
       }
     } catch (error) {
       print("Error fetching user data: $error");
+    }
+  }
+
+  Future<void> fetchTotalMasuk() async {
+    try {
+      final QuerySnapshot masukSnapshot = await _karyawan
+          .where('name', isEqualTo: _userName)
+          .where('keterangan', isEqualTo: 'Masuk')
+          .get();
+
+      totalMasuk = masukSnapshot.docs.length;
+      setState(() {});
+    } catch (error) {
+      print("Error fetching total masuk: $error");
+    }
+  }
+
+  Future<void> fetchTotalIzin() async {
+    try {
+      final QuerySnapshot izinSnapshot = await _karyawan
+          .where('name', isEqualTo: _userName)
+          .where('keterangan', isEqualTo: 'Izin')
+          .get();
+
+      totalIzin = izinSnapshot.docs.length;
+      setState(() {});
+    } catch (error) {
+      print("Error fetching total izin: $error");
+    }
+  }
+
+  Future<void> fetchTotalSakit() async {
+    try {
+      final QuerySnapshot sakitSnapshot = await _karyawan
+          .where('name', isEqualTo: _userName)
+          .where('keterangan', isEqualTo: 'Sakit')
+          .get();
+
+      totalSakit = sakitSnapshot.docs.length;
+      setState(() {});
+    } catch (error) {
+      print("Error fetching total sakit: $error");
     }
   }
 
@@ -374,7 +422,7 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '    XX Hari',
+                        '    $totalMasuk Hari',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 17,
@@ -382,7 +430,7 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       Text(
-                        '       X Hari     ',
+                        '       $totalIzin Hari     ',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 17,
@@ -390,7 +438,7 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       Text(
-                        'X Hari ',
+                        '$totalSakit Hari ',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 17,
