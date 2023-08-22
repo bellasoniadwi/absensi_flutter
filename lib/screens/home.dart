@@ -8,6 +8,7 @@ import 'package:absensi_flutter/data/utlity.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -26,6 +27,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    initializeDateFormatting("id_ID", null);
     fetchUserDataFromFirestore();
   }
 
@@ -146,11 +148,9 @@ class _HomeState extends State<Home> {
                                           style: TextStyle(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 19,
-                                            color: documentSnapshot[
-                                                        'keterangan'] ==
-                                                    'Masuk'
-                                                ? Colors.green
-                                                : Colors.red,
+                                            color: getStatusColor(
+                                              documentSnapshot['keterangan'],
+                                            ),
                                           ),
                                         ),
                                       ));
@@ -171,7 +171,6 @@ class _HomeState extends State<Home> {
 
   Widget _header() {
     final userData = Provider.of<UserData>(context);
-
     // Dapatkan data Nama dan Email dari variabel global
     final String accountName = userData.name ?? 'Guest';
     return Stack(
@@ -273,16 +272,12 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Total Balance',
+                        '',
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
-                          fontSize: 16,
+                          fontSize: 8,
                           color: Colors.white,
                         ),
-                      ),
-                      Icon(
-                        Icons.more_horiz,
-                        color: Colors.white,
                       ),
                     ],
                   ),
@@ -293,10 +288,10 @@ class _HomeState extends State<Home> {
                   child: Row(
                     children: [
                       Text(
-                        '\$ ${total()}',
+                        'Rekapitulasi Absensi ${DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now())}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 25,
+                          fontSize: 18,
                           color: Colors.white,
                         ),
                       ),
@@ -314,15 +309,11 @@ class _HomeState extends State<Home> {
                           CircleAvatar(
                             radius: 13,
                             backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.arrow_downward,
-                              color: Colors.blue,
-                              size: 19,
-                            ),
+                            child: Image.asset('images/m.png')
                           ),
                           SizedBox(width: 7),
                           Text(
-                            'Income',
+                            'Masuk',
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
@@ -336,15 +327,29 @@ class _HomeState extends State<Home> {
                           CircleAvatar(
                             radius: 13,
                             backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.arrow_upward,
-                              color: Colors.blue,
-                              size: 19,
-                            ),
+                            child: Image.asset('images/s.png')
                           ),
                           SizedBox(width: 7),
                           Text(
-                            'Expenses',
+                            'Sakit',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: Color.fromARGB(255, 216, 216, 216),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 13,
+                            backgroundColor: Colors.white,
+                            child: Image.asset('images/i.png')
+                          ),
+                          SizedBox(width: 7),
+                          Text(
+                            'Izin',
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
@@ -358,12 +363,12 @@ class _HomeState extends State<Home> {
                 ),
                 SizedBox(height: 6),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '\$ ${income()}',
+                        '    XX Hari',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 17,
@@ -371,7 +376,15 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       Text(
-                        '\$ ${expenses()}',
+                        '       X Hari     ',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 17,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        'X Hari ',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 17,
@@ -387,6 +400,16 @@ class _HomeState extends State<Home> {
         )
       ],
     );
+  }
+
+  Color getStatusColor(String keterangan) {
+    if (keterangan == 'Masuk') {
+      return Colors.green;
+    } else if (keterangan == 'Izin') {
+      return Colors.orange;
+    } else {
+      return Colors.red;
+    }
   }
 
   String _getFormattedTimestamp(Timestamp? timestamp) {

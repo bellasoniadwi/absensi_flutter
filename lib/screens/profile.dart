@@ -93,10 +93,10 @@ Widget build(BuildContext context) {
         alignment: AlignmentDirectional.center,
         children: [
           background_container(context),
-          Positioned(
-            top: 80,
-            child: SingleChildScrollView( // Wrap main_container with SingleChildScrollView
-              child: main_container(),
+          SingleChildScrollView(
+            child: Positioned(
+              top: 80,
+                child: main_container(),
             ),
           ),
         ],
@@ -152,14 +152,13 @@ Widget build(BuildContext context) {
     );
   }
 
-  SingleChildScrollView main_container() {
-    return SingleChildScrollView(
-      child: Container(
+  Container main_container() {
+    return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: Colors.white,
       ),
-      height: 700,
+      height: 710,
       width: 340,
       child: SingleChildScrollView(
         child: Column(
@@ -181,7 +180,6 @@ Widget build(BuildContext context) {
             ],
           ),
       ),
-    )
     );
   }
 
@@ -208,8 +206,8 @@ Widget build(BuildContext context) {
           ),
         ],
       ),
-      height: 175,
-      width: 175,
+      height: 225,
+      width: 225,
       margin: const EdgeInsets.only(left: 50.0, right: 30.0, top: 15),
       child: Stack(
         children: [
@@ -247,7 +245,7 @@ Widget build(BuildContext context) {
     return Text(
       "$accountName",
       style: TextStyle(
-        fontSize: 30.0,
+        fontSize: 40.0,
         color: Color(0xFF1A73E8),
         fontWeight: FontWeight.bold,
         fontFamily: "Pacifico",
@@ -261,8 +259,8 @@ Widget build(BuildContext context) {
     return Text(
       "$accountNomorInduk",
       style: TextStyle(
-          fontSize: 25,
-          color: Color.fromARGB(255, 29, 101, 245),
+          fontSize: 30,
+          color: Color(0xFF1A73E8),
           letterSpacing: 2.5,
           fontWeight: FontWeight.bold,
           fontFamily: "Source Sans Pro"),
