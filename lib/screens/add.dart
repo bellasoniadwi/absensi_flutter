@@ -46,8 +46,9 @@ class _Add_ScreenState extends State<Add_Screen> {
           String jabatan = userDoc.data()?['jabatan'] ?? '';
           String image = userDoc.data()?['image'] ?? '';
           String nomor_induk = userDoc.data()?['nomor_induk'] ?? '';
+          String telepon = userDoc.data()?['telepon'] ?? '';
           _nameController.text = name;
-          Provider.of<UserData>(context, listen: false).updateUserData(name, email, jabatan, image, nomor_induk);
+          Provider.of<UserData>(context, listen: false).updateUserData(name, email, jabatan, image, nomor_induk, telepon);
         }
       }
     } catch (error) {
@@ -114,11 +115,11 @@ class _Add_ScreenState extends State<Add_Screen> {
 
   GestureDetector save() {
     return GestureDetector(
-      onTap: _isSaving // Prevent button press when loading
-          ? null // Button is disabled when loading
+      onTap: _isSaving
+          ? null
           : () async {
               setState(() {
-                _isSaving = true; // Aktifkan indikator loading
+                _isSaving = true;
               });
 
               final String name = _nameController.text;
@@ -130,10 +131,9 @@ class _Add_ScreenState extends State<Add_Screen> {
               final String longitude = _currentLocation!.longitude.toString();
 
               if (_imagePath.isEmpty) {
-                // Ganti imageUrl.isEmpty menjadi _imagePath.isEmpty
                 setState(() {
                   _isSaving =
-                      false; // Matikan indikator loading setelah selesai
+                      false;
                 });
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text('Upload Foto Absen Anda'),
@@ -178,7 +178,7 @@ class _Add_ScreenState extends State<Add_Screen> {
 
                 setState(() {
                   _isSaving =
-                      false; // Matikan indikator loading setelah selesai
+                      false;
                 });
 
                 _nameController.text = '';
@@ -192,7 +192,7 @@ class _Add_ScreenState extends State<Add_Screen> {
               } else {
                 setState(() {
                   _isSaving =
-                      false; // Matikan indikator loading setelah selesai
+                      false;
                 });
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text('Masukkan keterangan kehadiran'),
@@ -210,7 +210,6 @@ class _Add_ScreenState extends State<Add_Screen> {
         height: 50,
         child: _isSaving
             ? CircularProgressIndicator(
-                // Tampilkan indikator loading
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
               )
             : Text(
@@ -315,15 +314,15 @@ class _Add_ScreenState extends State<Add_Screen> {
               color: Colors.blueAccent,
               width: 2.0,
             ),
-            borderRadius: BorderRadius.circular(4), // Atur sesuai kebutuhan
+            borderRadius: BorderRadius.circular(4),
           ),
         ),
         onPressed: () => _pickAndSetImage(),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.camera_alt, color: Colors.white), // Icon added here
-            SizedBox(width: 10), // Add some spacing between the icon and text
+            Icon(Icons.camera_alt, color: Colors.white),
+            SizedBox(width: 10),
             Text(
               'Ambil Foto',
               style:

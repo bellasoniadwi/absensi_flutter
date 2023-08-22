@@ -7,6 +7,7 @@ class UserData extends ChangeNotifier {
   String? jabatan;
   String? image;
   String? nomor_induk;
+  String? telepon;
   
 
   // Metode untuk memuat data pengguna dari Firestore berdasarkan UID
@@ -19,6 +20,7 @@ class UserData extends ChangeNotifier {
         jabatan = userDoc.data()?['jabatan'];
         image = userDoc.data()?['image'];
         nomor_induk = userDoc.data()?['nomor_induk'];
+        telepon = userDoc.data()?['telepon'];
         
         notifyListeners();
       }
@@ -28,12 +30,13 @@ class UserData extends ChangeNotifier {
   }
   
   // Metode untuk memperbarui data pengguna
-  void updateUserData(String newName, String newEmail, String newJabatan, String newImage, String newNomorinduk) {
+  void updateUserData(String newName, String newEmail, String newJabatan, String newImage, String newNomorinduk, String newTelepon) {
     name = newName;
     email = newEmail;
     jabatan = newJabatan;
     image = newImage;
     nomor_induk = newNomorinduk;
+    telepon = newTelepon;
     notifyListeners();
   }
 }

@@ -43,8 +43,9 @@ class _HomeState extends State<Home> {
           String jabatan = userDoc.data()?['jabatan'] ?? 'Jabatan';
           String image = userDoc.data()?['image'] ?? 'https://img.freepik.com/free-icon/user_318-159711.jpg';
           String nomor_induk = userDoc.data()?['nomor_induk'] ?? 'Nomor Induk';
+          String telepon = userDoc.data()?['telepon'] ?? 'Telepon';
           Provider.of<UserData>(context, listen: false)
-              .updateUserData(name, email, jabatan, image, nomor_induk);
+              .updateUserData(name, email, jabatan, image, nomor_induk, telepon);
         }
       }
     } catch (error) {
