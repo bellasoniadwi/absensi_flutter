@@ -21,6 +21,7 @@ class _HomeState extends State<Home> {
       FirebaseFirestore.instance.collection('karyawans');
   DateTime selectedDate = DateTime.now();
   String imageUrl = '';
+  String? _userName;
 
   @override
   void initState() {
@@ -44,8 +45,13 @@ class _HomeState extends State<Home> {
           String image = userDoc.data()?['image'] ?? 'https://img.freepik.com/free-icon/user_318-159711.jpg';
           String nomor_induk = userDoc.data()?['nomor_induk'] ?? 'Nomor Induk';
           String telepon = userDoc.data()?['telepon'] ?? 'Telepon';
+          
           Provider.of<UserData>(context, listen: false)
               .updateUserData(name, email, jabatan, image, nomor_induk, telepon);
+
+          setState(() {
+            _userName = userDoc.data()?['name'] ?? 'Guest';
+          });
         }
       }
     } catch (error) {
@@ -57,7 +63,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder(
-          stream: _karyawan.snapshots(),
+          stream: _karyawan.where('name', isEqualTo: _userName).snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
             if (streamSnapshot.hasData) {
               return SafeArea(

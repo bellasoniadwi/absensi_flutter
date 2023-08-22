@@ -49,11 +49,40 @@ class _BottomState extends State<Bottom> {
               ),
               SizedBox(width: 10),
               GestureDetector(
-                onTap: () {
-                  setState(() {
-                    index_color = 1;
-                  });
-                  _navigateToProfilePage();
+                onTap: () async {
+                  final user = FirebaseAuth.instance.currentUser;
+
+                  if (user != null) {
+                    try {
+                      var userDoc = await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(user.uid)
+                          .get();
+                      if (userDoc.exists) {
+                        Navigator.push(
+                          // Menggunakan Navigator.push
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ProfilePage(documentSnapshot: userDoc),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('User data not found')),
+                        );
+                      }
+                    } catch (error) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text('Error fetching user data: $error')),
+                      );
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('User not logged in')),
+                    );
+                  }
                 },
                 child: Icon(
                   Icons.person_outlined,
@@ -78,7 +107,8 @@ class _BottomState extends State<Bottom> {
             .doc(user.uid)
             .get();
         if (userDoc.exists) {
-          Navigator.push( // Menggunakan Navigator.push
+          Navigator.push(
+            // Menggunakan Navigator.push
             context,
             MaterialPageRoute(
               builder: (context) => ProfilePage(documentSnapshot: userDoc),

@@ -85,23 +85,25 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      body: SafeArea(
-        child: Stack(
-          alignment: AlignmentDirectional.center,
-          children: [
-            background_container(context),
-            Positioned(
-              top: 120,
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.grey.shade100,
+    body: SafeArea(
+      child: Stack(
+        alignment: AlignmentDirectional.center,
+        children: [
+          background_container(context),
+          Positioned(
+            top: 80,
+            child: SingleChildScrollView( // Wrap main_container with SingleChildScrollView
               child: main_container(),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Column background_container(BuildContext context) {
     return Column(
@@ -118,7 +120,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           child: Column(
             children: [
-              SizedBox(height: 40),
+              SizedBox(height: 30),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15),
                 child: Row(
@@ -127,7 +129,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).pop();
+                        Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Bottom()))
+                    .then((data) {});
                       },
                       child: Icon(Icons.arrow_back, color: Colors.white),
                     ),
@@ -148,32 +152,36 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Container main_container() {
-    return Container(
+  SingleChildScrollView main_container() {
+    return SingleChildScrollView(
+      child: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: Colors.white,
       ),
       height: 700,
       width: 340,
-      child: Column(
-        children: <Widget>[
-          foto(),
-          nama(),
-          nomorinduk(),
-          SizedBox(
-            height: 20,
-            width: 200,
-            child: Divider(
-              color: Colors.white,
-            ),
+      child: SingleChildScrollView(
+        child: Column(
+            children: <Widget>[
+              foto(),
+              nama(),
+              nomorinduk(),
+              SizedBox(
+                height: 20,
+                width: 200,
+                child: Divider(
+                  color: Colors.white,
+                ),
+              ),
+              email(),
+              jabatan(),
+              telepon(),
+              update(),
+            ],
           ),
-          email(),
-          jabatan(),
-          telepon(),
-          update(),
-        ],
       ),
+    )
     );
   }
 
@@ -200,8 +208,8 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
-      height: 225,
-      width: 225,
+      height: 175,
+      width: 175,
       margin: const EdgeInsets.only(left: 50.0, right: 30.0, top: 15),
       child: Stack(
         children: [
@@ -239,7 +247,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Text(
       "$accountName",
       style: TextStyle(
-        fontSize: 40.0,
+        fontSize: 30.0,
         color: Color(0xFF1A73E8),
         fontWeight: FontWeight.bold,
         fontFamily: "Pacifico",
@@ -253,7 +261,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Text(
       "$accountNomorInduk",
       style: TextStyle(
-          fontSize: 30,
+          fontSize: 25,
           color: Color.fromARGB(255, 29, 101, 245),
           letterSpacing: 2.5,
           fontWeight: FontWeight.bold,
@@ -342,7 +350,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Padding update() {
     return Padding(
-      padding: const EdgeInsets.only(left: 25, right: 25),
+      padding: const EdgeInsets.only(left: 25, right: 25, top: 25),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           primary: Colors.blueAccent,
