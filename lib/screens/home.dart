@@ -1,5 +1,6 @@
 import 'package:absensi_flutter/auth/signin_screen.dart';
 import 'package:absensi_flutter/models/user_data.dart';
+import 'package:absensi_flutter/screens/riwayat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -75,12 +76,12 @@ class _HomeState extends State<Home> {
                         return CustomScrollView(
                           slivers: [
                             SliverToBoxAdapter(
-                              child: SizedBox(height: 340, child: _header()),
+                              child: SizedBox(height: 370, child: _header()),
                             ),
                             SliverToBoxAdapter(
                               child: Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
+                                    const EdgeInsets.only(left: 15, right: 15, bottom: 20),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -93,12 +94,17 @@ class _HomeState extends State<Home> {
                                         color: Colors.black,
                                       ),
                                     ),
-                                    Text(
-                                      'See all',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 15,
-                                        color: Colors.grey,
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => RiwayatAbsen()));
+                                      },
+                                      child: Text(
+                                        'See all',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 15,
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -155,7 +161,7 @@ class _HomeState extends State<Home> {
                                         ),
                                       ));
                                 },
-                                childCount: streamSnapshot.data!.docs.length,
+                                childCount: 3,
                               ),
                             )
                           ],
