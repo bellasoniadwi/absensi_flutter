@@ -88,10 +88,8 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
                           child: ListView.builder(
                             itemCount: streamSnapshot.data!.docs.length,
                             itemBuilder: (context, index) {
-                              // menampilkan descending
-                              final reversedIndex = streamSnapshot.data!.docs.length - 1 - index;
                               final DocumentSnapshot documentSnapshot =
-                                  streamSnapshot.data!.docs[reversedIndex];
+                                  streamSnapshot.data!.docs[index];
                               return Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 5),
                                 child: GestureDetector(

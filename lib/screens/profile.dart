@@ -95,7 +95,7 @@ Widget build(BuildContext context) {
           background_container(context),
           SingleChildScrollView(
             child: Positioned(
-              top: 80,
+              top: 90,
                 child: main_container(),
             ),
           ),
