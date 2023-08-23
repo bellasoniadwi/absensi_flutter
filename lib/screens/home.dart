@@ -67,6 +67,8 @@ class _HomeState extends State<Home> {
 
   Future<void> fetchTotalAbsensi() async {
     try {
+      final DateTime now = DateTime.now();
+
       final QuerySnapshot masukSnapshot = await _karyawan
           .where('name', isEqualTo: _userName)
           .where('keterangan', isEqualTo: 'Masuk')
@@ -82,13 +84,27 @@ class _HomeState extends State<Home> {
           .where('keterangan', isEqualTo: 'Sakit')
           .get();
 
-      totalMasuk = masukSnapshot.docs.length;
-      totalIzin = izinSnapshot.docs.length;
-      totalSakit = sakitSnapshot.docs.length;
+      totalMasuk = countEntriesWithinMonthYear(masukSnapshot.docs, now.year, now.month);
+      totalIzin = countEntriesWithinMonthYear(izinSnapshot.docs, now.year, now.month);
+      totalSakit = countEntriesWithinMonthYear(sakitSnapshot.docs, now.year, now.month);
+
       setState(() {});
     } catch (error) {
       print("Error fetching : $error");
     }
+  }
+
+  // mengubah format timestamps menjadi datetime
+  int countEntriesWithinMonthYear(List<QueryDocumentSnapshot> documents, int year, int month) {
+    int count = 0;
+    for (var doc in documents) {
+      DateTime docTimestamp = (doc['timestamps'] as Timestamp).toDate();
+      if (docTimestamp.year == year && docTimestamp.month == month) {
+        count++;
+      }
+    }
+
+    return count;
   }
 
   @override
@@ -320,7 +336,7 @@ class _HomeState extends State<Home> {
                   child: Row(
                     children: [
                       Text(
-                        'Rekapitulasi Absensi ${DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now())}',
+                        'Rekapitulasi Absensi ${DateFormat('dd MMMM yyyy', 'id_ID').format(DateTime.now())}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -461,7 +477,7 @@ class _HomeState extends State<Home> {
     DateTime dateTime = timestamp.toDate();
     // Format the DateTime as a human-readable string (change the format as desired)
     String formattedDateTime =
-        DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+        DateFormat('dd-MM-yyyy HH:mm:ss').format(dateTime);
     return formattedDateTime;
   }
 }
