@@ -336,7 +336,7 @@ class _HomeState extends State<Home> {
                   child: Row(
                     children: [
                       Text(
-                        'Rekapitulasi Absensi ${DateFormat('dd MMMM yyyy', 'id_ID').format(DateTime.now())}',
+                        'Rekapitulasi Absensi ${DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now())}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
