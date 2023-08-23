@@ -177,6 +177,7 @@ Widget build(BuildContext context) {
               jabatan(),
               telepon(),
               update(),
+              SizedBox(height: 50),
             ],
           ),
       ),
@@ -239,18 +240,21 @@ Widget build(BuildContext context) {
     );
   }
 
-  Text nama() {
+  Center nama() {
     final userData = Provider.of<UserData>(context);
     final String accountName = userData.name ?? 'Name';
-    return Text(
-      "$accountName",
-      style: TextStyle(
-        fontSize: 40.0,
-        color: Color(0xFF1A73E8),
-        fontWeight: FontWeight.bold,
-        fontFamily: "Pacifico",
-      ),
-    );
+    return Center(
+  child: Text(
+    "$accountName",
+    textAlign: TextAlign.center, // Teks akan diatur ke tengah secara horizontal
+    style: TextStyle(
+      fontSize: 33.0,
+      color: Color(0xFF1A73E8),
+      fontWeight: FontWeight.bold,
+      fontFamily: "Pacifico",
+    ),
+  ),
+);
   }
 
   Text nomorinduk() {
@@ -259,7 +263,7 @@ Widget build(BuildContext context) {
     return Text(
       "$accountNomorInduk",
       style: TextStyle(
-          fontSize: 30,
+          fontSize: 25,
           color: Color(0xFF1A73E8),
           letterSpacing: 2.5,
           fontWeight: FontWeight.bold,

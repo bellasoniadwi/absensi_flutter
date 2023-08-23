@@ -80,7 +80,7 @@ class _Add_ScreenState extends State<Add_Screen> {
         borderRadius: BorderRadius.circular(20),
         color: Colors.white,
       ),
-      height: 700,
+      height: 650,
       width: 340,
       child: Column(
         children: [
@@ -162,8 +162,9 @@ class _Add_ScreenState extends State<Add_Screen> {
 
                 String imageUrl = await referenceImageToUpload.getDownloadURL();
 
-                // Generate custom id : increment
-                String docId = DateTime.now().millisecondsSinceEpoch.toString();
+                // Generate custom id : decrement
+                int docCustom = 3000000000000-DateTime.now().millisecondsSinceEpoch;
+                String docId = docCustom.toString();
                 // Create a reference to the document using the custom ID
                 DocumentReference documentReference = _karyawan.doc(docId);
 
@@ -231,15 +232,17 @@ class _Add_ScreenState extends State<Add_Screen> {
       child: TextField(
         controller: _nameController,
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
           labelText: 'Nama',
-          labelStyle: TextStyle(fontSize: 17, color: Colors.grey.shade500),
-          enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(width: 2, color: Color(0xffC5C5C5))),
-          focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(width: 2, color: Color(0xFF1A73E8))),
+          labelStyle: TextStyle(
+            color: Colors.blueAccent,
+            fontFamily: "Source Sans Pro",
+          ),
+          border: OutlineInputBorder(),
+        ),
+        style: TextStyle(
+          color: Colors.blueAccent,
+          fontSize: 18,
+          fontFamily: "Source Sans Pro",
         ),
         enabled: false,
       ),
@@ -247,60 +250,78 @@ class _Add_ScreenState extends State<Add_Screen> {
   }
 
   Padding keterangan() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        width: 300,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            width: 2,
-            color: Color(0xffC5C5C5),
-          ),
-        ),
-        child: DropdownButton<String>(
-          value: _selectedValue,
-          onChanged: ((value) {
-            setState(() {
-              _selectedValue = value as String?;
-            });
-          }),
-          items: listOfValue
-              .map((e) => DropdownMenuItem(
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: Row(
-                        children: [
-                          Text(
-                            e,
-                            style: TextStyle(fontSize: 18),
-                          )
-                        ],
-                      ),
-                    ),
-                    value: e,
-                  ))
-              .toList(),
-          selectedItemBuilder: (BuildContext context) => listOfValue
-              .map((e) => Row(
-                    children: [Text(e)],
-                  ))
-              .toList(),
-          hint: Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Text(
-              'Pilih Keterangan',
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-          dropdownColor: Colors.white,
-          isExpanded: true,
-          underline: Container(),
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: Container(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      height: 60,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+          width: 0.5,
+          color: Color(0xffC5C5C5),
         ),
       ),
-    );
-  }
+      child: DropdownButton<String>(
+        value: _selectedValue,
+        onChanged: ((value) {
+          setState(() {
+            _selectedValue = value as String?;
+          });
+        }),
+        items: listOfValue
+            .map((e) => DropdownMenuItem(
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: Row(
+                      children: [
+                        Text(
+                          e,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.blueAccent,
+                            fontFamily: "Source Sans Pro",
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  value: e,
+                ))
+            .toList(),
+        selectedItemBuilder: (BuildContext context) => listOfValue
+            .map((e) => Row(
+                  children: [
+                    Text(
+                      e,
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.blueAccent,
+                        fontFamily: "Source Sans Pro",
+                      ),
+                    ),
+                  ],
+                ))
+            .toList(),
+        hint: Padding(
+          padding: const EdgeInsets.only(left: 1),
+          child: Text(
+            'Pilih Keterangan',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.blueAccent,
+              fontFamily: "Source Sans Pro",
+            ),
+          ),
+        ),
+        dropdownColor: Colors.white,
+        isExpanded: true,
+        underline: Container(),
+      ),
+    ),
+  );
+}
+
 
   Padding foto() {
     return Padding(

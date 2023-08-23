@@ -33,9 +33,6 @@ class _HomeState extends State<Home> {
     super.initState();
     initializeDateFormatting("id_ID", null);
     fetchUserDataFromFirestore();
-    fetchTotalMasuk();
-    fetchTotalIzin();
-    fetchTotalSakit();
   }
 
   Future<void> fetchUserDataFromFirestore() async {
@@ -68,45 +65,29 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<void> fetchTotalMasuk() async {
+  Future<void> fetchTotalAbsensi() async {
     try {
       final QuerySnapshot masukSnapshot = await _karyawan
           .where('name', isEqualTo: _userName)
           .where('keterangan', isEqualTo: 'Masuk')
           .get();
 
-      totalMasuk = masukSnapshot.docs.length;
-      setState(() {});
-    } catch (error) {
-      print("Error fetching total masuk: $error");
-    }
-  }
-
-  Future<void> fetchTotalIzin() async {
-    try {
       final QuerySnapshot izinSnapshot = await _karyawan
           .where('name', isEqualTo: _userName)
           .where('keterangan', isEqualTo: 'Izin')
           .get();
 
-      totalIzin = izinSnapshot.docs.length;
-      setState(() {});
-    } catch (error) {
-      print("Error fetching total izin: $error");
-    }
-  }
-
-  Future<void> fetchTotalSakit() async {
-    try {
       final QuerySnapshot sakitSnapshot = await _karyawan
           .where('name', isEqualTo: _userName)
           .where('keterangan', isEqualTo: 'Sakit')
           .get();
 
+      totalMasuk = masukSnapshot.docs.length;
+      totalIzin = izinSnapshot.docs.length;
       totalSakit = sakitSnapshot.docs.length;
       setState(() {});
     } catch (error) {
-      print("Error fetching total sakit: $error");
+      print("Error fetching : $error");
     }
   }
 
@@ -117,6 +98,7 @@ class _HomeState extends State<Home> {
           stream: _karyawan.where('name', isEqualTo: _userName).snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
             if (streamSnapshot.hasData) {
+              fetchTotalAbsensi();
               return SafeArea(
                   child: ValueListenableBuilder(
                       valueListenable: box.listenable(),
@@ -147,7 +129,7 @@ class _HomeState extends State<Home> {
                                         Navigator.push(context, MaterialPageRoute(builder: (context) => RiwayatAbsen()));
                                       },
                                       child: Text(
-                                        'See all',
+                                        'Lihat semua',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w600,
                                           fontSize: 15,
@@ -162,12 +144,8 @@ class _HomeState extends State<Home> {
                             SliverList(
                               delegate: SliverChildBuilderDelegate(
                                 (context, index) {
-                                  final reversedIndex =
-                                      streamSnapshot.data!.docs.length -
-                                          1 -
-                                          index;
                                   final DocumentSnapshot documentSnapshot =
-                                      streamSnapshot.data!.docs[reversedIndex];
+                                      streamSnapshot.data!.docs[index];
 
                                   return Dismissible(
                                       key: UniqueKey(),
@@ -209,7 +187,7 @@ class _HomeState extends State<Home> {
                                         ),
                                       ));
                                 },
-                                childCount: 3,
+                                childCount: getNumberLength(streamSnapshot.data!.docs.length),
                               ),
                             )
                           ],
@@ -381,11 +359,11 @@ class _HomeState extends State<Home> {
                           CircleAvatar(
                             radius: 13,
                             backgroundColor: Colors.white,
-                            child: Image.asset('images/s.png')
+                            child: Image.asset('images/i.png')
                           ),
                           SizedBox(width: 7),
                           Text(
-                            'Sakit',
+                            'Izin',
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
@@ -399,11 +377,11 @@ class _HomeState extends State<Home> {
                           CircleAvatar(
                             radius: 13,
                             backgroundColor: Colors.white,
-                            child: Image.asset('images/i.png')
+                            child: Image.asset('images/s.png')
                           ),
                           SizedBox(width: 7),
                           Text(
-                            'Izin',
+                            'Sakit',
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
@@ -463,6 +441,14 @@ class _HomeState extends State<Home> {
       return Colors.orange;
     } else {
       return Colors.red;
+    }
+  }
+
+  int getNumberLength(int length) {
+    if (length >= 3) {
+      return 3;
+    } else {
+      return length;
     }
   }
 
