@@ -39,7 +39,10 @@ class _Add_ScreenState extends State<Add_Screen> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        var userDoc =  await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        var userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
         if (userDoc.exists) {
           String name = userDoc.data()?['name'] ?? '';
           String email = userDoc.data()?['email'] ?? '';
@@ -48,7 +51,8 @@ class _Add_ScreenState extends State<Add_Screen> {
           String nomor_induk = userDoc.data()?['nomor_induk'] ?? '';
           String telepon = userDoc.data()?['telepon'] ?? '';
           _nameController.text = name;
-          Provider.of<UserData>(context, listen: false).updateUserData(name, email, jabatan, image, nomor_induk, telepon);
+          Provider.of<UserData>(context, listen: false).updateUserData(
+              name, email, jabatan, image, nomor_induk, telepon);
         }
       }
     } catch (error) {
@@ -124,16 +128,28 @@ class _Add_ScreenState extends State<Add_Screen> {
 
               final String name = _nameController.text;
               final String keterangan = _selectedValue.toString();
+              String latitude = '';
+              String longitude = '';
 
               // Get current latitude and longitude
               _currentLocation = await _getCurrentLocation();
-              final String latitude = _currentLocation!.latitude.toString();
-              final String longitude = _currentLocation!.longitude.toString();
+              if (_currentLocation!.accuracy < 13) {
+                setState(() {
+                  _isSaving = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Terdeteksi penggunaan Fake GPS pada device anda'),
+                  backgroundColor: Colors.blueAccent,
+                ));
+                return;
+              } else {
+                latitude = _currentLocation!.latitude.toString();
+                longitude = _currentLocation!.longitude.toString();
+              }
 
               if (_imagePath.isEmpty) {
                 setState(() {
-                  _isSaving =
-                      false;
+                  _isSaving = false;
                 });
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text('Upload Foto Absen Anda'),
@@ -163,7 +179,8 @@ class _Add_ScreenState extends State<Add_Screen> {
                 String imageUrl = await referenceImageToUpload.getDownloadURL();
 
                 // Generate custom id : decrement
-                int docCustom = 3000000000000-DateTime.now().millisecondsSinceEpoch;
+                int docCustom =
+                    3000000000000 - DateTime.now().millisecondsSinceEpoch;
                 String docId = docCustom.toString();
                 // Create a reference to the document using the custom ID
                 DocumentReference documentReference = _karyawan.doc(docId);
@@ -178,8 +195,7 @@ class _Add_ScreenState extends State<Add_Screen> {
                 });
 
                 setState(() {
-                  _isSaving =
-                      false;
+                  _isSaving = false;
                 });
 
                 _nameController.text = '';
@@ -192,8 +208,7 @@ class _Add_ScreenState extends State<Add_Screen> {
                 Navigator.pop(context);
               } else {
                 setState(() {
-                  _isSaving =
-                      false;
+                  _isSaving = false;
                 });
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text('Masukkan keterangan kehadiran'),
@@ -250,78 +265,77 @@ class _Add_ScreenState extends State<Add_Screen> {
   }
 
   Padding keterangan() {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20),
-    child: Container(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      height: 60,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        border: Border.all(
-          width: 0.5,
-          color: Color(0xffC5C5C5),
-        ),
-      ),
-      child: DropdownButton<String>(
-        value: _selectedValue,
-        onChanged: ((value) {
-          setState(() {
-            _selectedValue = value as String?;
-          });
-        }),
-        items: listOfValue
-            .map((e) => DropdownMenuItem(
-                  child: Container(
-                    alignment: Alignment.center,
-                    child: Row(
-                      children: [
-                        Text(
-                          e,
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.blueAccent,
-                            fontFamily: "Source Sans Pro",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  value: e,
-                ))
-            .toList(),
-        selectedItemBuilder: (BuildContext context) => listOfValue
-            .map((e) => Row(
-                  children: [
-                    Text(
-                      e,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.blueAccent,
-                        fontFamily: "Source Sans Pro",
-                      ),
-                    ),
-                  ],
-                ))
-            .toList(),
-        hint: Padding(
-          padding: const EdgeInsets.only(left: 1),
-          child: Text(
-            'Pilih Keterangan',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.blueAccent,
-              fontFamily: "Source Sans Pro",
-            ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        height: 60,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(
+            width: 0.5,
+            color: Color(0xffC5C5C5),
           ),
         ),
-        dropdownColor: Colors.white,
-        isExpanded: true,
-        underline: Container(),
+        child: DropdownButton<String>(
+          value: _selectedValue,
+          onChanged: ((value) {
+            setState(() {
+              _selectedValue = value as String?;
+            });
+          }),
+          items: listOfValue
+              .map((e) => DropdownMenuItem(
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Row(
+                        children: [
+                          Text(
+                            e,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.blueAccent,
+                              fontFamily: "Source Sans Pro",
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    value: e,
+                  ))
+              .toList(),
+          selectedItemBuilder: (BuildContext context) => listOfValue
+              .map((e) => Row(
+                    children: [
+                      Text(
+                        e,
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.blueAccent,
+                          fontFamily: "Source Sans Pro",
+                        ),
+                      ),
+                    ],
+                  ))
+              .toList(),
+          hint: Padding(
+            padding: const EdgeInsets.only(left: 1),
+            child: Text(
+              'Pilih Keterangan',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.blueAccent,
+                fontFamily: "Source Sans Pro",
+              ),
+            ),
+          ),
+          dropdownColor: Colors.white,
+          isExpanded: true,
+          underline: Container(),
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Padding foto() {
     return Padding(
