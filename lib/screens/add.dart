@@ -142,7 +142,7 @@ class _Add_ScreenState extends State<Add_Screen> {
 
               // Get current latitude and longitude
               _currentLocation = await _getCurrentLocation();
-              if (_currentLocation!.accuracy < 13) {
+              if (_currentLocation!.accuracy < 12) {
                 setState(() {
                   _isSaving = false;
                 });
