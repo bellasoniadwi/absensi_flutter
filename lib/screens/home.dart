@@ -48,12 +48,13 @@ class _HomeState extends State<Home> {
           String name = userDoc.data()?['name'] ?? 'Guest';
           String email = userDoc.data()?['email'] ?? 'guest@example.com';
           String jabatan = userDoc.data()?['jabatan'] ?? 'Jabatan';
-          String image = userDoc.data()?['image'] ?? 'https://img.freepik.com/free-icon/user_318-159711.jpg';
+          String image = userDoc.data()?['image'] ??
+              'https://img.freepik.com/free-icon/user_318-159711.jpg';
           String nomor_induk = userDoc.data()?['nomor_induk'] ?? 'Nomor Induk';
           String telepon = userDoc.data()?['telepon'] ?? 'Telepon';
-          
-          Provider.of<UserData>(context, listen: false)
-              .updateUserData(name, email, jabatan, image, nomor_induk, telepon);
+
+          Provider.of<UserData>(context, listen: false).updateUserData(
+              name, email, jabatan, image, nomor_induk, telepon);
 
           setState(() {
             _userName = userDoc.data()?['name'] ?? 'Guest';
@@ -84,9 +85,12 @@ class _HomeState extends State<Home> {
           .where('keterangan', isEqualTo: 'Sakit')
           .get();
 
-      totalMasuk = countEntriesWithinMonthYear(masukSnapshot.docs, now.year, now.month);
-      totalIzin = countEntriesWithinMonthYear(izinSnapshot.docs, now.year, now.month);
-      totalSakit = countEntriesWithinMonthYear(sakitSnapshot.docs, now.year, now.month);
+      totalMasuk =
+          countEntriesWithinMonthYear(masukSnapshot.docs, now.year, now.month);
+      totalIzin =
+          countEntriesWithinMonthYear(izinSnapshot.docs, now.year, now.month);
+      totalSakit =
+          countEntriesWithinMonthYear(sakitSnapshot.docs, now.year, now.month);
 
       setState(() {});
     } catch (error) {
@@ -95,7 +99,8 @@ class _HomeState extends State<Home> {
   }
 
   // mengubah format timestamps menjadi datetime
-  int countEntriesWithinMonthYear(List<QueryDocumentSnapshot> documents, int year, int month) {
+  int countEntriesWithinMonthYear(
+      List<QueryDocumentSnapshot> documents, int year, int month) {
     int count = 0;
     for (var doc in documents) {
       DateTime docTimestamp = (doc['timestamps'] as Timestamp).toDate();
@@ -126,8 +131,8 @@ class _HomeState extends State<Home> {
                             ),
                             SliverToBoxAdapter(
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 15, right: 15, bottom: 20),
+                                padding: const EdgeInsets.only(
+                                    left: 15, right: 15, bottom: 20),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -142,7 +147,11 @@ class _HomeState extends State<Home> {
                                     ),
                                     GestureDetector(
                                       onTap: () {
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => RiwayatAbsen()));
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RiwayatAbsen()));
                                       },
                                       child: Text(
                                         'Lihat semua',
@@ -203,7 +212,8 @@ class _HomeState extends State<Home> {
                                         ),
                                       ));
                                 },
-                                childCount: getNumberLength(streamSnapshot.data!.docs.length),
+                                childCount: getNumberLength(
+                                    streamSnapshot.data!.docs.length),
                               ),
                             )
                           ],
@@ -255,10 +265,13 @@ class _HomeState extends State<Home> {
                             await FirebaseAuth.instance.signOut();
                             final SharedPreferences prefs =
                                 await SharedPreferences.getInstance();
-                            prefs.remove('isLoggedIn'); // Hapus status login saat logout
+                            prefs.remove(
+                                'isLoggedIn'); // Hapus status login saat logout
                             print("Signed Out");
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => SignInScreen()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SignInScreen()));
                           },
                         ),
                       ),
@@ -352,96 +365,93 @@ class _HomeState extends State<Home> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 13,
-                            backgroundColor: Colors.white,
-                            child: Image.asset('images/m.png')
-                          ),
-                          SizedBox(width: 7),
-                          Text(
-                            'Masuk',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                              color: Color.fromARGB(255, 216, 216, 216),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                                radius: 13,
+                                backgroundColor: Colors.white,
+                                child: Image.asset('images/m.png')),
+                            SizedBox(height: 7),
+                            Text(
+                              'Masuk',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: Color.fromARGB(255, 216, 216, 216),
+                              ),
                             ),
-                          ),
-                        ],
+                            SizedBox(height: 6),
+                            Text(
+                              '$totalMasuk Hari',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 17,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 13,
-                            backgroundColor: Colors.white,
-                            child: Image.asset('images/i.png')
-                          ),
-                          SizedBox(width: 7),
-                          Text(
-                            'Izin',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                              color: Color.fromARGB(255, 216, 216, 216),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                                radius: 13,
+                                backgroundColor: Colors.white,
+                                child: Image.asset('images/i.png')),
+                            SizedBox(height: 7),
+                            Text(
+                              'Izin',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: Color.fromARGB(255, 216, 216, 216),
+                              ),
                             ),
-                          ),
-                        ],
+                            SizedBox(height: 6),
+                            Text(
+                              '$totalIzin Hari',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 17,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 13,
-                            backgroundColor: Colors.white,
-                            child: Image.asset('images/s.png')
-                          ),
-                          SizedBox(width: 7),
-                          Text(
-                            'Sakit',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                              color: Color.fromARGB(255, 216, 216, 216),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                                radius: 13,
+                                backgroundColor: Colors.white,
+                                child: Image.asset('images/s.png')),
+                            SizedBox(height: 7),
+                            Text(
+                              'Sakit',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: Color.fromARGB(255, 216, 216, 216),
+                              ),
                             ),
-                          ),
-                        ],
+                            SizedBox(height: 6),
+                            Text(
+                              '$totalSakit Hari',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 17,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 6),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '    $totalMasuk Hari',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 17,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        '       $totalIzin Hari     ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 17,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        '$totalSakit Hari ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 17,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
               ],
             ),
           ),
