@@ -130,6 +130,15 @@ class _Add_ScreenState extends State<Add_Screen> {
               final String keterangan = _selectedValue.toString();
               String latitude = '';
               String longitude = '';
+              String status = '';
+              DateTime currentTime = DateTime.now();
+              DateTime targetTime = DateTime(currentTime.year, currentTime.month, currentTime.day, 8, 4);
+
+              if (currentTime.isAfter(targetTime)) {
+                status = 'Terlambat';
+              } else {
+                status = 'Tepat Waktu';
+              }
 
               // Get current latitude and longitude
               _currentLocation = await _getCurrentLocation();
@@ -192,6 +201,7 @@ class _Add_ScreenState extends State<Add_Screen> {
                   "latitude": latitude,
                   "longitude": longitude,
                   "keterangan": keterangan,
+                  "status": status,
                 });
 
                 setState(() {
