@@ -310,7 +310,6 @@ class _HomeState extends State<Home> {
           top: 140,
           left: 37,
           child: Container(
-            height: 170,
             width: 320,
             decoration: BoxDecoration(
               boxShadow: [
@@ -324,135 +323,135 @@ class _HomeState extends State<Home> {
               color: Color(0xFF1A73E8),
               borderRadius: BorderRadius.circular(15),
             ),
-            child: Column(
-              children: [
-                SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 8,
-                          color: Colors.white,
+            child: SingleChildScrollView(
+              // Tambahkan widget SingleChildScrollView di sini
+              child: Column(
+                children: [
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 8,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 7),
-                Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Rekapitulasi Absensi ${DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now())}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
+                  SizedBox(height: 7),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: Text(
+                      'Rekapitulasi Absensi ${DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now())}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.white,
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 25),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                                radius: 13,
-                                backgroundColor: Colors.white,
-                                child: Image.asset('images/m.png')),
-                            SizedBox(height: 7),
-                            Text(
-                              'Masuk',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                                color: Color.fromARGB(255, 216, 216, 216),
+                  SizedBox(height: 20),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(right: 15, left: 15, bottom: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                  radius: 13,
+                                  backgroundColor: Colors.white,
+                                  child: Image.asset('images/m.png')),
+                              SizedBox(height: 7),
+                              Text(
+                                'Masuk',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                  color: Color.fromARGB(255, 216, 216, 216),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              '$totalMasuk Hari',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 17,
-                                color: Colors.white,
+                              SizedBox(height: 6),
+                              Text(
+                                '$totalMasuk Hari',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 17,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                                radius: 13,
-                                backgroundColor: Colors.white,
-                                child: Image.asset('images/i.png')),
-                            SizedBox(height: 7),
-                            Text(
-                              'Izin',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                                color: Color.fromARGB(255, 216, 216, 216),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                  radius: 13,
+                                  backgroundColor: Colors.white,
+                                  child: Image.asset('images/i.png')),
+                              SizedBox(height: 7),
+                              Text(
+                                'Izin',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                  color: Color.fromARGB(255, 216, 216, 216),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              '$totalIzin Hari',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 17,
-                                color: Colors.white,
+                              SizedBox(height: 6),
+                              Text(
+                                '$totalIzin Hari',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 17,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                                radius: 13,
-                                backgroundColor: Colors.white,
-                                child: Image.asset('images/s.png')),
-                            SizedBox(height: 7),
-                            Text(
-                              'Sakit',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                                color: Color.fromARGB(255, 216, 216, 216),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                  radius: 13,
+                                  backgroundColor: Colors.white,
+                                  child: Image.asset('images/s.png')),
+                              SizedBox(height: 7),
+                              Text(
+                                'Sakit',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                  color: Color.fromARGB(255, 216, 216, 216),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              '$totalSakit Hari',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 17,
-                                color: Colors.white,
+                              SizedBox(height: 6),
+                              Text(
+                                '$totalSakit Hari',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 17,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         )
