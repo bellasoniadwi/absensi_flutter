@@ -309,6 +309,7 @@ class _HomeState extends State<Home> {
         Positioned(
           top: 140,
           left: 37,
+          right: 37,
           child: Container(
             width: 320,
             decoration: BoxDecoration(
@@ -346,7 +347,7 @@ class _HomeState extends State<Home> {
                   ),
                   SizedBox(height: 7),
                   Padding(
-                    padding: const EdgeInsets.only(left: 15),
+                    padding: const EdgeInsets.only(left: 11, right: 11),
                     child: Text(
                       'Rekapitulasi Absensi ${DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now())}',
                       style: TextStyle(
