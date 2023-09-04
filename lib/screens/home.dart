@@ -4,8 +4,6 @@ import 'package:absensi_flutter/screens/riwayat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:absensi_flutter/data/utlity.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -121,104 +119,97 @@ class _HomeState extends State<Home> {
             if (streamSnapshot.hasData) {
               fetchTotalAbsensi();
               return SafeArea(
-                  child: ValueListenableBuilder(
-                      valueListenable: box.listenable(),
-                      builder: (context, value, child) {
-                        return CustomScrollView(
-                          slivers: [
-                            SliverToBoxAdapter(
-                              child: SizedBox(height: 370, child: _header()),
+                  child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: SizedBox(height: 370, child: _header()),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 15, right: 15, bottom: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Riwayat Absensi',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 19,
+                              color: Colors.black,
                             ),
-                            SliverToBoxAdapter(
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 15, right: 15, bottom: 20),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Riwayat Absensi',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 19,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    RiwayatAbsen()));
-                                      },
-                                      child: Text(
-                                        'Lihat semua',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 15,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RiwayatAbsen()));
+                            },
+                            child: Text(
+                              'Lihat semua',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final DocumentSnapshot documentSnapshot =
+                            streamSnapshot.data!.docs[index];
+
+                        return Dismissible(
+                            key: UniqueKey(),
+                            onDismissed: (direction) {},
+                            child: ListTile(
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  documentSnapshot['image'],
+                                  width: 60,
+                                  height: 80,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                            ),
-                            SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  final DocumentSnapshot documentSnapshot =
-                                      streamSnapshot.data!.docs[index];
-
-                                  return Dismissible(
-                                      key: UniqueKey(),
-                                      onDismissed: (direction) {},
-                                      child: ListTile(
-                                        leading: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: Image.network(
-                                            documentSnapshot['image'],
-                                            width: 60,
-                                            height: 80,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        title: Text(
-                                          documentSnapshot['name'],
-                                          style: TextStyle(
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        subtitle: Text(
-                                          _getFormattedTimestamp(
-                                              documentSnapshot['timestamps']),
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        trailing: Text(
-                                          documentSnapshot['keterangan'],
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 19,
-                                            color: getStatusColor(
-                                              documentSnapshot['keterangan'],
-                                            ),
-                                          ),
-                                        ),
-                                      ));
-                                },
-                                childCount: getNumberLength(
-                                    streamSnapshot.data!.docs.length),
+                              title: Text(
+                                documentSnapshot['name'],
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            )
-                          ],
-                        );
-                      }));
+                              subtitle: Text(
+                                _getFormattedTimestamp(
+                                    documentSnapshot['timestamps']),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              trailing: Text(
+                                documentSnapshot['keterangan'],
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 19,
+                                  color: getStatusColor(
+                                    documentSnapshot['keterangan'],
+                                  ),
+                                ),
+                              ),
+                            ));
+                      },
+                      childCount:
+                          getNumberLength(streamSnapshot.data!.docs.length),
+                    ),
+                  )
+                ],
+              ));
             }
             return const Center(
               child: CircularProgressIndicator(),
