@@ -85,8 +85,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     .get();
                 if (userDoc.exists) {
                   String role = userDoc.data()?['role'] ?? '';
+                  bool isblocking = userDoc.data()?['isblocking'] ?? '';
                   
-                  if (role == 'Karyawan') {
+                  if (role == 'Karyawan' && isblocking == false) {
                     String jabatan = userDoc.data()?['jabatan'] ?? '';
                     String image = userDoc.data()?['image'] ?? '';
                     String nomor_induk = userDoc.data()?['nomor_induk'] ?? '';
@@ -110,7 +111,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
-                            'You are not allowed to log in. Please contact the admin.'),
+                            'Anda tidak diperkenankan untuk login. Mohon untuk menghubungi admin.'),
                             backgroundColor: Colors.blueAccent,));
                   }
                 }
