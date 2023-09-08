@@ -129,15 +129,35 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
                                                 fontSize: 15,
                                                 letterSpacing: 1)
                                               ),
-                                              Text(
-                                                    '\n'+documentSnapshot[
-                                                        'keterangan'],
-                                                style: TextStyle(
-                                                fontSize: 15,
-                                                letterSpacing: 1,
-                                                color: getStatusColor(
-                                                  documentSnapshot['keterangan'],
-                                                ),)
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                        '\n'+documentSnapshot[
+                                                            'keterangan'],
+                                                    style: TextStyle(
+                                                    fontSize: 15,
+                                                    letterSpacing: 1,
+                                                    color: getStatusColor(
+                                                      documentSnapshot['keterangan'],
+                                                    ),)
+                                                  ),
+                                                  Text(
+                                                        '\n  -  ',
+                                                    style: TextStyle(
+                                                    fontSize: 15,
+                                                    letterSpacing: 1,)
+                                                  ),
+                                                  Text(
+                                                        '\n'+documentSnapshot[
+                                                            'status'],
+                                                    style: TextStyle(
+                                                    fontSize: 15,
+                                                    letterSpacing: 1,
+                                                    color: getStatusColorStatus(
+                                                      documentSnapshot['status'],
+                                                    ),)
+                                                  ),
+                                                ],
                                               ),
                                               const SizedBox(
                                                 height: 5,
@@ -207,6 +227,14 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
       return Colors.green;
     } else if (keterangan == 'Izin') {
       return Colors.orange;
+    } else {
+      return Colors.red;
+    }
+  }
+
+  Color getStatusColorStatus(String status) {
+    if (status == 'Tepat Waktu') {
+      return Colors.blue;
     } else {
       return Colors.red;
     }

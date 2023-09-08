@@ -193,12 +193,12 @@ class _HomeState extends State<Home> {
                                 ),
                               ),
                               trailing: Text(
-                                documentSnapshot['keterangan'],
+                                documentSnapshot['status'],
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 19,
                                   color: getStatusColor(
-                                    documentSnapshot['keterangan'],
+                                    documentSnapshot['status'],
                                   ),
                                 ),
                               ),
@@ -238,60 +238,69 @@ class _HomeState extends State<Home> {
               ),
               child: Stack(
                 children: [
-                  Positioned(
-                    top: 35,
-                    left: 340,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(7),
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        color: Color.fromRGBO(250, 250, 250, 0.1),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.logout,
-                            color: Colors.white,
-                          ),
-                          onPressed: () async {
-                            await FirebaseAuth.instance.signOut();
-                            final SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            prefs.remove(
-                                'isLoggedIn'); // Hapus status login saat logout
-                            print("Signed Out");
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SignInScreen()));
-                          },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 35, left: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Welcome,',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: Color.fromARGB(255, 224, 223, 223),
+                              ),
+                            ),
+                            Text(
+                              '$accountName',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 20,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 35, left: 10, right: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(7),
+                              child: Container(
+                                height: 40,
+                                width: 40,
+                                color: Color.fromRGBO(250, 250, 250, 0.1),
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.logout,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () async {
+                                    await FirebaseAuth.instance.signOut();
+                                    final SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
+                                    prefs.remove('isLoggedIn');
+                                    print("Signed Out");
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                SignInScreen()));
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 35, left: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Welcome,',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: Color.fromARGB(255, 224, 223, 223),
-                          ),
-                        ),
-                        Text(
-                          '$accountName',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 20,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
                 ],
               ),
             ),
@@ -451,11 +460,9 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Color getStatusColor(String keterangan) {
-    if (keterangan == 'Masuk') {
-      return Colors.green;
-    } else if (keterangan == 'Izin') {
-      return Colors.orange;
+  Color getStatusColor(String status) {
+    if (status == 'Tepat Waktu') {
+      return Colors.blue;
     } else {
       return Colors.red;
     }
