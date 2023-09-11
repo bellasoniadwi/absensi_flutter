@@ -24,8 +24,9 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _jabatanController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _teleponController = TextEditingController();
-  final CollectionReference _users =
-      FirebaseFirestore.instance.collection('users');
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _nomorindukController = TextEditingController();
+  final CollectionReference _users = FirebaseFirestore.instance.collection('users');
 
   String imageUrl = '';
   String _imagePath = '';
@@ -75,6 +76,8 @@ class _ProfilePageState extends State<ProfilePage> {
           _jabatanController.text = jabatan;
           _emailController.text = email;
           _teleponController.text = telepon;
+          _nameController.text = name;
+          _nomorindukController.text = nomor_induk;
           Provider.of<UserData>(context, listen: false).updateUserData(
               name, email, jabatan, image, nomor_induk, telepon);
         }
@@ -85,25 +88,25 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: Colors.grey.shade100,
-    body: SafeArea(
-      child: Stack(
-        alignment: AlignmentDirectional.center,
-        children: [
-          background_container(context),
-          SingleChildScrollView(
-            child: Positioned(
-              top: 90,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey.shade100,
+      body: SafeArea(
+        child: Stack(
+          alignment: AlignmentDirectional.center,
+          children: [
+            background_container(context),
+            SingleChildScrollView(
+              child: Positioned(
+                top: 90,
                 child: main_container(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Column background_container(BuildContext context) {
     return Column(
@@ -129,9 +132,11 @@ Widget build(BuildContext context) {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Bottom()))
-                    .then((data) {});
+                        Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Bottom()))
+                            .then((data) {});
                       },
                       child: Icon(Icons.arrow_back, color: Colors.white),
                     ),
@@ -162,24 +167,24 @@ Widget build(BuildContext context) {
       width: 340,
       child: SingleChildScrollView(
         child: Column(
-            children: <Widget>[
-              foto(),
-              nama(),
-              nomorinduk(),
-              SizedBox(
-                height: 20,
-                width: 200,
-                child: Divider(
-                  color: Colors.white,
-                ),
+          children: <Widget>[
+            foto(),
+            SizedBox(
+              height: 20,
+              width: 200,
+              child: Divider(
+                color: Colors.white,
               ),
-              email(),
-              jabatan(),
-              telepon(),
-              update(),
-              SizedBox(height: 50),
-            ],
-          ),
+            ),
+            nama(),
+            nomorinduk(),
+            email(),
+            jabatan(),
+            telepon(),
+            update(),
+            SizedBox(height: 50),
+          ],
+        ),
       ),
     );
   }
@@ -240,34 +245,89 @@ Widget build(BuildContext context) {
     );
   }
 
-  Center nama() {
-    final userData = Provider.of<UserData>(context);
-    final String accountName = userData.name ?? 'Name';
-    return Center(
-  child: Text(
-    "$accountName",
-    textAlign: TextAlign.center, // Teks akan diatur ke tengah secara horizontal
-    style: TextStyle(
-      fontSize: 33.0,
-      color: Color(0xFF1A73E8),
-      fontWeight: FontWeight.bold,
-      fontFamily: "Pacifico",
-    ),
-  ),
-);
+  // Center nama() {
+  //   final userData = Provider.of<UserData>(context);
+  //   final String accountName = userData.name ?? 'Name';
+  //   return Center(
+  //     child: Text(
+  //       "$accountName",
+  //       textAlign:
+  //           TextAlign.center, // Teks akan diatur ke tengah secara horizontal
+  //       style: TextStyle(
+  //         fontSize: 33.0,
+  //         color: Color(0xFF1A73E8),
+  //         fontWeight: FontWeight.bold,
+  //         fontFamily: "Pacifico",
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Padding nama() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 25, right: 25, bottom: 15),
+      child: TextField(
+        controller: _nameController,
+        decoration: InputDecoration(
+          labelText: 'Nama',
+          labelStyle: TextStyle(
+            color: Colors.blueAccent,
+            fontFamily: "Source Sans Pro",
+          ),
+          prefixIcon: Icon(
+            Icons.person,
+            color: Colors.blueAccent,
+          ),
+          border: OutlineInputBorder(),
+        ),
+        style: TextStyle(
+          color: Colors.blueAccent,
+          fontSize: 20,
+          fontFamily: "Source Sans Pro",
+        ),
+        enabled: false,
+      ),
+    );
   }
 
-  Text nomorinduk() {
-    final userData = Provider.of<UserData>(context);
-    final String accountNomorInduk = userData.nomor_induk ?? 'Nomor Induk';
-    return Text(
-      "$accountNomorInduk",
-      style: TextStyle(
-          fontSize: 25,
-          color: Color(0xFF1A73E8),
-          letterSpacing: 2.5,
-          fontWeight: FontWeight.bold,
-          fontFamily: "Source Sans Pro"),
+  // Text nomorinduk() {
+  //   final userData = Provider.of<UserData>(context);
+  //   final String accountNomorInduk = userData.nomor_induk ?? 'Nomor Induk';
+  //   return Text(
+  //     "$accountNomorInduk",
+  //     style: TextStyle(
+  //         fontSize: 25,
+  //         color: Color(0xFF1A73E8),
+  //         letterSpacing: 2.5,
+  //         fontWeight: FontWeight.bold,
+  //         fontFamily: "Source Sans Pro"),
+  //   );
+  // }
+
+  Padding nomorinduk() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 25, right: 25, bottom: 15),
+      child: TextField(
+        controller: _nomorindukController,
+        decoration: InputDecoration(
+          labelText: 'Nomor Induk',
+          labelStyle: TextStyle(
+            color: Colors.blueAccent,
+            fontFamily: "Source Sans Pro",
+          ),
+          prefixIcon: Icon(
+            Icons.format_list_numbered_sharp,
+            color: Colors.blueAccent,
+          ),
+          border: OutlineInputBorder(),
+        ),
+        style: TextStyle(
+          color: Colors.blueAccent,
+          fontSize: 20,
+          fontFamily: "Source Sans Pro",
+        ),
+        enabled: false,
+      ),
     );
   }
 
