@@ -10,6 +10,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:image/image.dart' as img;
+
 
 class Add_Screen extends StatefulWidget {
   const Add_Screen({super.key});
@@ -434,9 +436,34 @@ class _Add_ScreenState extends State<Add_Screen> {
     ImagePicker imagePicker = ImagePicker();
     XFile? file = await imagePicker.pickImage(source: ImageSource.camera);
     if (file == null) return;
+
+    final File compressedImage = await compressImage(File(file.path), 200);
+
     setState(() {
       _imagePath = file.path;
     });
+  }
+
+  Future<File> compressImage(File file, int maxSizeInKB) async {
+    final img.Image? image = img.decodeImage(file.readAsBytesSync());
+    if (image == null) {
+      return file;
+    }
+
+    final int targetSize = maxSizeInKB * 1024; // Ubah KB menjadi byte
+    int currentSize = file.lengthSync();
+    int quality = 90; // Kualitas awal gambar
+
+    while (currentSize > targetSize) {
+      final img.Image compressedImage = img.copyResize(image, width: image.width ~/ 2, height: image.height ~/ 2);
+      quality -= 10;
+      final compressedImageData = img.encodeJpg(compressedImage, quality: quality);
+      final compressedFile = File(file.path)
+        ..writeAsBytesSync(compressedImageData);
+      currentSize = compressedFile.lengthSync();
+    }
+
+    return file;
   }
 
   // Fungsi Pembantu Image untuk mengatur imageUrl dengan menggunakan setState.
