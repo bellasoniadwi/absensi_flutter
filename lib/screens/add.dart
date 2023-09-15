@@ -12,7 +12,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:image/image.dart' as img;
 
-
 class Add_Screen extends StatefulWidget {
   const Add_Screen({super.key});
 
@@ -29,8 +28,10 @@ class _Add_ScreenState extends State<Add_Screen> {
   String _imagePath = '';
   bool _isSaving = false;
 
-  String? _selectedValue;
-  List<String> listOfValue = ['Masuk', 'Izin', 'Sakit'];
+  String? _selectedValueMasuk;
+  List<String> listOfMasuk = ['Masuk', 'Izin'];
+  String? _selectedValuePulang;
+  List<String> listOfPulang = ['Tidak Lembur', 'Izin'];
 
   void initState() {
     super.initState();
@@ -63,6 +64,26 @@ class _Add_ScreenState extends State<Add_Screen> {
   }
 
   Widget build(BuildContext context) {
+    final currentTime = DateTime.now();
+    String timePeriod;
+
+    if (currentTime.hour >= 6 && currentTime.hour <= 11) {
+      timePeriod = "datang";
+    } else if (currentTime.hour >= 12 && currentTime.hour <= 17) {
+      timePeriod = "pulang";
+    } else if (currentTime.hour >= 18 && currentTime.hour <= 23) {
+      timePeriod = "lembur";
+    } else {
+      timePeriod = "tidak ada";
+    }
+
+    Widget containerToDisplay;
+    if (timePeriod == "tidak ada") {
+      containerToDisplay = main_container_noabsen();
+    } else {
+      containerToDisplay = main_container();
+    }
+
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       body: SafeArea(
@@ -72,7 +93,61 @@ class _Add_ScreenState extends State<Add_Screen> {
             background_container(context),
             Positioned(
               top: 90,
-              child: main_container(),
+              child: 
+              containerToDisplay,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Container main_container_noabsen() {
+    return Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+      ),
+      height: 650,
+      width: 340,
+      child: Column(
+        children: [
+          SizedBox(height: 100),
+          informasi(),
+        ],
+      ),
+    );
+  }
+
+  Container informasi() {
+    return Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: Color(0xFF1A73E8),
+      ),
+      width: 250,
+      height: 400,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.warning_rounded,
+              color: Colors.white,
+              size: 80,
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Tidak ada absen untuk ditampilkan pada jam ini',
+              style: TextStyle(
+                fontFamily: 'f',
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                fontSize: 40,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -81,6 +156,19 @@ class _Add_ScreenState extends State<Add_Screen> {
   }
 
   Container main_container() {
+    final currentTime = DateTime.now();
+    String timePeriod;
+
+    if (currentTime.hour >= 6 && currentTime.hour <= 11) {
+      timePeriod = "datang";
+    } else if (currentTime.hour >= 12 && currentTime.hour <= 17) {
+      timePeriod = "pulang";
+    } else if (currentTime.hour >= 18 && currentTime.hour <= 23) {
+      timePeriod = "lembur";
+    } else {
+      timePeriod = "tidak ada";
+    }
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -93,7 +181,9 @@ class _Add_ScreenState extends State<Add_Screen> {
           SizedBox(height: 40),
           nama(),
           SizedBox(height: 30),
-          keterangan(),
+          if (timePeriod == "datang") keterangan_datang(),
+          if (timePeriod == "pulang") keterangan_pulang(),
+          if (timePeriod == "lembur") keterangan_lembur(),
           SizedBox(height: 30),
           foto(),
           SizedBox(height: 20),
@@ -110,16 +200,17 @@ class _Add_ScreenState extends State<Add_Screen> {
                     : null,
               ),
             ),
-          // Spacer(),
           SizedBox(height: 30),
-          save(),
+          if (timePeriod == "datang") save_datang(),
+          if (timePeriod == "pulang") save_pulang(),
+          if (timePeriod == "lembur") save_lembur(),
           SizedBox(height: 25),
         ],
       ),
     );
   }
 
-  GestureDetector save() {
+  GestureDetector save_datang() {
     return GestureDetector(
       onTap: _isSaving
           ? null
@@ -129,12 +220,13 @@ class _Add_ScreenState extends State<Add_Screen> {
               });
 
               final String name = _nameController.text;
-              final String keterangan = _selectedValue.toString();
+              final String keterangan = _selectedValueMasuk.toString();
               String latitude = '';
               String longitude = '';
               String status = '';
               DateTime currentTime = DateTime.now();
-              DateTime targetTime = DateTime(currentTime.year, currentTime.month, currentTime.day, 8, 4);
+              DateTime targetTime = DateTime(
+                  currentTime.year, currentTime.month, currentTime.day, 8, 4);
 
               if (currentTime.isAfter(targetTime)) {
                 status = 'Terlambat';
@@ -149,7 +241,8 @@ class _Add_ScreenState extends State<Add_Screen> {
                   _isSaving = false;
                 });
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Terdeteksi penggunaan Fake GPS pada device anda'),
+                  content:
+                      Text('Terdeteksi penggunaan Fake GPS pada device anda'),
                   backgroundColor: Colors.blueAccent,
                 ));
                 return;
@@ -169,9 +262,7 @@ class _Add_ScreenState extends State<Add_Screen> {
                 return;
               }
 
-              if (keterangan == "Masuk" ||
-                  keterangan == "Izin" ||
-                  keterangan == "Sakit") {
+              if (keterangan == "Masuk" || keterangan == "Izin") {
                 Uint8List imageBytes = await File(_imagePath).readAsBytes();
                 String uniqueFileName =
                     DateTime.now().millisecondsSinceEpoch.toString();
@@ -204,6 +295,7 @@ class _Add_ScreenState extends State<Add_Screen> {
                   "longitude": longitude,
                   "keterangan": keterangan,
                   "status": status,
+                  "kategori": "Datang"
                 });
 
                 setState(() {
@@ -253,6 +345,242 @@ class _Add_ScreenState extends State<Add_Screen> {
     );
   }
 
+  GestureDetector save_pulang() {
+    return GestureDetector(
+      onTap: _isSaving
+          ? null
+          : () async {
+              setState(() {
+                _isSaving = true;
+              });
+
+              final String name = _nameController.text;
+              final String keterangan = _selectedValuePulang.toString();
+              String latitude = '';
+              String longitude = '';
+
+              // Get current latitude and longitude
+              _currentLocation = await _getCurrentLocation();
+              if (_currentLocation!.accuracy < 10) {
+                setState(() {
+                  _isSaving = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content:
+                      Text('Terdeteksi penggunaan Fake GPS pada device anda'),
+                  backgroundColor: Colors.blueAccent,
+                ));
+                return;
+              } else {
+                latitude = _currentLocation!.latitude.toString();
+                longitude = _currentLocation!.longitude.toString();
+              }
+
+              if (_imagePath.isEmpty) {
+                setState(() {
+                  _isSaving = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Upload Foto Absen Anda'),
+                  backgroundColor: Colors.blueAccent,
+                ));
+                return;
+              }
+
+              if (keterangan == "Tidak Lembur" || keterangan == "Izin") {
+                Uint8List imageBytes = await File(_imagePath).readAsBytes();
+                String uniqueFileName =
+                    DateTime.now().millisecondsSinceEpoch.toString();
+                String formattedDateTime =
+                    DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+                String fileName = 'images/' +
+                    uniqueFileName +
+                    '_' +
+                    formattedDateTime +
+                    '.jpg';
+                Reference referenceImageToUpload =
+                    FirebaseStorage.instance.ref().child(fileName);
+                await referenceImageToUpload.putData(imageBytes);
+
+                String imageUrl = await referenceImageToUpload.getDownloadURL();
+
+                // Generate custom id : decrement
+                int docCustom =
+                    3000000000000 - DateTime.now().millisecondsSinceEpoch;
+                String docId = docCustom.toString();
+                // Create a reference to the document using the custom ID
+                DocumentReference documentReference = _karyawan.doc(docId);
+
+                await documentReference.set({
+                  "name": name,
+                  "timestamps": FieldValue.serverTimestamp(),
+                  "image": imageUrl,
+                  "latitude": latitude,
+                  "longitude": longitude,
+                  "keterangan": keterangan,
+                  "status": "Tepat Waktu",
+                  "kategori": "Pulang"
+                });
+
+                setState(() {
+                  _isSaving = false;
+                });
+
+                _nameController.text = '';
+                _imagePath = '';
+
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Data Absensi anda berhasil tersimpan'),
+                  backgroundColor: Colors.blueAccent,
+                ));
+                Navigator.pop(context);
+              } else {
+                setState(() {
+                  _isSaving = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Masukkan keterangan kepulangan'),
+                  backgroundColor: Colors.blueAccent,
+                ));
+              }
+            },
+      child: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Color(0xFF1A73E8),
+        ),
+        width: 120,
+        height: 50,
+        child: _isSaving
+            ? CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+              )
+            : Text(
+                'Simpan Data',
+                style: TextStyle(
+                  fontFamily: 'f',
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  fontSize: 17,
+                ),
+              ),
+      ),
+    );
+  }
+
+  GestureDetector save_lembur() {
+    return GestureDetector(
+      onTap: _isSaving
+          ? null
+          : () async {
+              setState(() {
+                _isSaving = true;
+              });
+
+              final String name = _nameController.text;
+              String latitude = '';
+              String longitude = '';
+
+              // Get current latitude and longitude
+              _currentLocation = await _getCurrentLocation();
+              if (_currentLocation!.accuracy < 10) {
+                setState(() {
+                  _isSaving = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content:
+                      Text('Terdeteksi penggunaan Fake GPS pada device anda'),
+                  backgroundColor: Colors.blueAccent,
+                ));
+                return;
+              } else {
+                latitude = _currentLocation!.latitude.toString();
+                longitude = _currentLocation!.longitude.toString();
+              }
+
+              if (_imagePath.isEmpty) {
+                setState(() {
+                  _isSaving = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Upload Foto Absen Anda'),
+                  backgroundColor: Colors.blueAccent,
+                ));
+                return;
+              }
+
+              Uint8List imageBytes = await File(_imagePath).readAsBytes();
+              String uniqueFileName =
+                  DateTime.now().millisecondsSinceEpoch.toString();
+              String formattedDateTime =
+                  DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+              String fileName =
+                  'images/' + uniqueFileName + '_' + formattedDateTime + '.jpg';
+              Reference referenceImageToUpload =
+                  FirebaseStorage.instance.ref().child(fileName);
+              await referenceImageToUpload.putData(imageBytes);
+
+              String imageUrl = await referenceImageToUpload.getDownloadURL();
+
+              // Generate custom id : decrement
+              int docCustom =
+                  3000000000000 - DateTime.now().millisecondsSinceEpoch;
+              String docId = docCustom.toString();
+              // Create a reference to the document using the custom ID
+              DocumentReference documentReference = _karyawan.doc(docId);
+
+              await documentReference.set({
+                "name": name,
+                "timestamps": FieldValue.serverTimestamp(),
+                "image": imageUrl,
+                "latitude": latitude,
+                "longitude": longitude,
+                "keterangan": "Lembur",
+                "status": "Tepat Waktu",
+                "kategori": "Pulang"
+              });
+
+              setState(() {
+                _isSaving = false;
+              });
+
+              _nameController.text = '';
+              _imagePath = '';
+
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('Data Absensi anda berhasil tersimpan'),
+                backgroundColor: Colors.blueAccent,
+              ));
+              Navigator.pop(context);
+            },
+      child: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Color(0xFF1A73E8),
+        ),
+        width: 120,
+        height: 50,
+        child: _isSaving
+            ? CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+              )
+            : Text(
+                'Simpan Data',
+                style: TextStyle(
+                  fontFamily: 'f',
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  fontSize: 17,
+                ),
+              ),
+      ),
+    );
+  }
+
   Padding nama() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -276,7 +604,33 @@ class _Add_ScreenState extends State<Add_Screen> {
     );
   }
 
-  Padding keterangan() {
+  Padding keterangan_lembur() {
+    TextEditingController _keteranganController = TextEditingController(
+      text: "Lembur",
+    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: TextField(
+        controller: _keteranganController,
+        decoration: InputDecoration(
+          labelText: 'Keterangan',
+          labelStyle: TextStyle(
+            color: Colors.blueAccent,
+            fontFamily: "Source Sans Pro",
+          ),
+          border: OutlineInputBorder(),
+        ),
+        style: TextStyle(
+          color: Colors.blueAccent,
+          fontSize: 18,
+          fontFamily: "Source Sans Pro",
+        ),
+        enabled: false,
+      ),
+    );
+  }
+
+  Padding keterangan_datang() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
@@ -290,13 +644,13 @@ class _Add_ScreenState extends State<Add_Screen> {
           ),
         ),
         child: DropdownButton<String>(
-          value: _selectedValue,
+          value: _selectedValueMasuk,
           onChanged: ((value) {
             setState(() {
-              _selectedValue = value as String?;
+              _selectedValueMasuk = value as String?;
             });
           }),
-          items: listOfValue
+          items: listOfMasuk
               .map((e) => DropdownMenuItem(
                     child: Container(
                       alignment: Alignment.center,
@@ -316,7 +670,80 @@ class _Add_ScreenState extends State<Add_Screen> {
                     value: e,
                   ))
               .toList(),
-          selectedItemBuilder: (BuildContext context) => listOfValue
+          selectedItemBuilder: (BuildContext context) => listOfMasuk
+              .map((e) => Row(
+                    children: [
+                      Text(
+                        e,
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.blueAccent,
+                          fontFamily: "Source Sans Pro",
+                        ),
+                      ),
+                    ],
+                  ))
+              .toList(),
+          hint: Padding(
+            padding: const EdgeInsets.only(left: 1),
+            child: Text(
+              'Pilih Keterangan',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.blueAccent,
+                fontFamily: "Source Sans Pro",
+              ),
+            ),
+          ),
+          dropdownColor: Colors.white,
+          isExpanded: true,
+          underline: Container(),
+        ),
+      ),
+    );
+  }
+
+  Padding keterangan_pulang() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        height: 60,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(
+            width: 0.5,
+            color: Color(0xffC5C5C5),
+          ),
+        ),
+        child: DropdownButton<String>(
+          value: _selectedValuePulang,
+          onChanged: ((value) {
+            setState(() {
+              _selectedValuePulang = value as String?;
+            });
+          }),
+          items: listOfPulang
+              .map((e) => DropdownMenuItem(
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Row(
+                        children: [
+                          Text(
+                            e,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.blueAccent,
+                              fontFamily: "Source Sans Pro",
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    value: e,
+                  ))
+              .toList(),
+          selectedItemBuilder: (BuildContext context) => listOfPulang
               .map((e) => Row(
                     children: [
                       Text(
@@ -382,6 +809,19 @@ class _Add_ScreenState extends State<Add_Screen> {
   }
 
   Column background_container(BuildContext context) {
+    final currentTime = DateTime.now();
+    String timePeriod;
+
+    if (currentTime.hour >= 6 && currentTime.hour <= 11) {
+      timePeriod = "datang";
+    } else if (currentTime.hour >= 12 && currentTime.hour <= 17) {
+      timePeriod = "pulang";
+    } else if (currentTime.hour >= 18 && currentTime.hour <= 23) {
+      timePeriod = "lembur";
+    } else {
+      timePeriod = "tidak ada";
+    }
+
     return Column(
       children: [
         Container(
@@ -409,13 +849,38 @@ class _Add_ScreenState extends State<Add_Screen> {
                       },
                       child: Icon(Icons.arrow_back, color: Colors.white),
                     ),
-                    Text(
-                      'Form Absensi',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white),
-                    ),
+                    if (timePeriod == "datang")
+                      Text(
+                        'Form Absensi Datang',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white),
+                      ),
+                    if (timePeriod == "pulang")
+                      Text(
+                        'Form Absensi Pulang',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white),
+                      ),
+                    if (timePeriod == "lembur")
+                      Text(
+                        'Form Absensi Lembur',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white),
+                      ),
+                    if (timePeriod == "tidak ada")
+                      Text(
+                        'Absen tidak ditemukan',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white),
+                      ),
                     Icon(
                       Icons.attach_file_outlined,
                       color: Colors.white,
@@ -450,14 +915,16 @@ class _Add_ScreenState extends State<Add_Screen> {
       return file;
     }
 
-    final int targetSize = maxSizeInKB * 1024; // Ubah KB menjadi byte
+    final int targetSize = maxSizeInKB * 1024;
     int currentSize = file.lengthSync();
-    int quality = 90; // Kualitas awal gambar
+    int quality = 90;
 
     while (currentSize > targetSize) {
-      final img.Image compressedImage = img.copyResize(image, width: image.width ~/ 2, height: image.height ~/ 2);
+      final img.Image compressedImage = img.copyResize(image,
+          width: image.width ~/ 2, height: image.height ~/ 2);
       quality -= 10;
-      final compressedImageData = img.encodeJpg(compressedImage, quality: quality);
+      final compressedImageData =
+          img.encodeJpg(compressedImage, quality: quality);
       final compressedFile = File(file.path)
         ..writeAsBytesSync(compressedImageData);
       currentSize = compressedFile.lengthSync();
