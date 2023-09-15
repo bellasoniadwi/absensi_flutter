@@ -193,22 +193,15 @@ class _HomeState extends State<Home> {
                                 ),
                               ),
                               trailing: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text(
-                                    "",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 10,
-                                      color: Colors.black, // Sesuaikan dengan warna yang sesuai
-                                    ),
-                                  ),
                                   Text(
                                     documentSnapshot['kategori'],
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16,
-                                      color: Colors.black, // Sesuaikan dengan warna yang sesuai
+                                      color: Colors.black,
                                     ),
                                   ),
                                   Text(
