@@ -4,6 +4,7 @@ import 'package:absensi_flutter/screens/riwayat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -116,12 +117,18 @@ class _HomeState extends State<Home> {
           .where('kategori', isEqualTo: 'Pulang')
           .get();
 
-      totalTepatWaktuDatang = countEntriesWithinMonthYear(tepatWaktuDatangSnapshot.docs, now.year, now.month);
-      totalTerlambatDatang = countEntriesWithinMonthYear(telatDatangSnapshot.docs, now.year, now.month);
-      totalIzinDatang = countEntriesWithinMonthYear(izinDatangSnapshot.docs, now.year, now.month);
-      totalPulangBiasa = countEntriesWithinMonthYear(pulangBiasaSnapshot.docs, now.year, now.month);
-      totalLembur = countEntriesWithinMonthYear(pulangLemburSnapshot.docs, now.year, now.month);
-      totalIzinPulang = countEntriesWithinMonthYear(izinPulangSnapshot.docs, now.year, now.month);
+      totalTepatWaktuDatang = countEntriesWithinMonthYear(
+          tepatWaktuDatangSnapshot.docs, now.year, now.month);
+      totalTerlambatDatang = countEntriesWithinMonthYear(
+          telatDatangSnapshot.docs, now.year, now.month);
+      totalIzinDatang = countEntriesWithinMonthYear(
+          izinDatangSnapshot.docs, now.year, now.month);
+      totalPulangBiasa = countEntriesWithinMonthYear(
+          pulangBiasaSnapshot.docs, now.year, now.month);
+      totalLembur = countEntriesWithinMonthYear(
+          pulangLemburSnapshot.docs, now.year, now.month);
+      totalIzinPulang = countEntriesWithinMonthYear(
+          izinPulangSnapshot.docs, now.year, now.month);
 
       setState(() {});
     } catch (error) {
@@ -370,28 +377,28 @@ class _HomeState extends State<Home> {
               borderRadius: BorderRadius.circular(15),
             ),
             child: GestureDetector(
-            onHorizontalDragEnd: (DragEndDetails details) {
-              if (details.primaryVelocity! > 0) {
-                _pageController.previousPage(
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.easeInOut,
-                );
-              } else {
-                _pageController.nextPage(
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.easeInOut,
-                );
-              }
-            },
-            child: PageView(
-              controller: _pageController,
-              physics: NeverScrollableScrollPhysics(),
-              children: [
-                rekap_datang(),
-                rekap_pulang(),
-              ],
+              onHorizontalDragEnd: (DragEndDetails details) {
+                if (details.primaryVelocity! > 0) {
+                  _pageController.previousPage(
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                  );
+                } else {
+                  _pageController.nextPage(
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              },
+              child: PageView(
+                controller: _pageController,
+                physics: NeverScrollableScrollPhysics(),
+                children: [
+                  rekap_datang(),
+                  rekap_pulang(),
+                ],
+              ),
             ),
-          ),
           ),
         )
       ],
@@ -441,9 +448,13 @@ class _HomeState extends State<Home> {
                   child: Column(
                     children: [
                       CircleAvatar(
-                          radius: 13,
+                          radius: 15,
                           backgroundColor: Colors.white,
-                          child: Image.asset('images/m.png')),
+                          child: Icon(
+                            FontAwesomeIcons.thumbsUp,
+                            color: Color(0xFF1A73E8),
+                            size: 18,
+                          ),),
                       SizedBox(height: 7),
                       Text(
                         'Tepat Waktu',
@@ -469,9 +480,13 @@ class _HomeState extends State<Home> {
                   child: Column(
                     children: [
                       CircleAvatar(
-                          radius: 13,
+                          radius: 15,
                           backgroundColor: Colors.white,
-                          child: Image.asset('images/i.png')),
+                          child: Icon(
+                            FontAwesomeIcons.thumbsDown,
+                            color: Color(0xFF1A73E8),
+                            size: 18,
+                          ),),
                       SizedBox(height: 7),
                       Text(
                         'Terlambat',
@@ -497,9 +512,13 @@ class _HomeState extends State<Home> {
                   child: Column(
                     children: [
                       CircleAvatar(
-                          radius: 13,
+                          radius: 15,
                           backgroundColor: Colors.white,
-                          child: Image.asset('images/s.png')),
+                          child: Icon(
+                            FontAwesomeIcons.handshake,
+                            color: Color(0xFF1A73E8),
+                            size: 18,
+                          ),),
                       SizedBox(height: 7),
                       Text(
                         'Izin',
@@ -571,9 +590,12 @@ class _HomeState extends State<Home> {
                 child: Column(
                   children: [
                     CircleAvatar(
-                        radius: 13,
+                        radius: 15,
                         backgroundColor: Colors.white,
-                        child: Image.asset('images/m.png')),
+                        child: Icon(
+                          FontAwesomeIcons.thumbsUp,
+                          color: Color(0xFF1A73E8),
+                          size: 18,)),
                     SizedBox(height: 7),
                     Text(
                       'Normal',
@@ -599,9 +621,12 @@ class _HomeState extends State<Home> {
                 child: Column(
                   children: [
                     CircleAvatar(
-                        radius: 13,
+                        radius: 15,
                         backgroundColor: Colors.white,
-                        child: Image.asset('images/i.png')),
+                        child: Icon(
+                          FontAwesomeIcons.handshake,
+                          color: Color(0xFF1A73E8),
+                          size: 18,)),
                     SizedBox(height: 7),
                     Text(
                       'Izin',
@@ -627,9 +652,12 @@ class _HomeState extends State<Home> {
                 child: Column(
                   children: [
                     CircleAvatar(
-                        radius: 13,
+                        radius: 15,
                         backgroundColor: Colors.white,
-                        child: Image.asset('images/s.png')),
+                        child: Icon(
+                          FontAwesomeIcons.star,
+                          color: Color(0xFF1A73E8),
+                          size: 18,)),
                     SizedBox(height: 7),
                     Text(
                       'Lembur',
@@ -657,7 +685,6 @@ class _HomeState extends State<Home> {
       ],
     );
   }
-  
 
   Color getStatusColor(String status) {
     if (status == 'Tepat Waktu') {
