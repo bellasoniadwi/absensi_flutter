@@ -192,15 +192,36 @@ class _HomeState extends State<Home> {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              trailing: Text(
-                                documentSnapshot['status'],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 19,
-                                  color: getStatusColor(
-                                    documentSnapshot['status'],
+                              trailing: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    "",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 10,
+                                      color: Colors.black, // Sesuaikan dengan warna yang sesuai
+                                    ),
                                   ),
-                                ),
+                                  Text(
+                                    documentSnapshot['kategori'],
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                      color: Colors.black, // Sesuaikan dengan warna yang sesuai
+                                    ),
+                                  ),
+                                  Text(
+                                    documentSnapshot['status'],
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 17,
+                                      color: getStatusColor(
+                                        documentSnapshot['status'],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ));
                       },
