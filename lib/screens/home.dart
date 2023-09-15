@@ -22,9 +22,19 @@ class _HomeState extends State<Home> {
   DateTime selectedDate = DateTime.now();
   String imageUrl = '';
   String? _userName;
-  int totalMasuk = 0;
-  int totalIzin = 0;
-  int totalSakit = 0;
+  int totalTepatWaktuDatang = 0;
+  int totalTerlambatDatang = 0;
+  int totalIzinDatang = 0;
+  int totalPulangBiasa = 0;
+  int totalLembur = 0;
+  int totalIzinPulang = 0;
+  PageController _pageController = PageController(initialPage: 0);
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -68,27 +78,50 @@ class _HomeState extends State<Home> {
     try {
       final DateTime now = DateTime.now();
 
-      final QuerySnapshot masukSnapshot = await _karyawan
+      final QuerySnapshot tepatWaktuDatangSnapshot = await _karyawan
           .where('name', isEqualTo: _userName)
           .where('keterangan', isEqualTo: 'Masuk')
+          .where('status', isEqualTo: 'Tepat Waktu')
+          .where('kategori', isEqualTo: 'Datang')
           .get();
 
-      final QuerySnapshot izinSnapshot = await _karyawan
+      final QuerySnapshot telatDatangSnapshot = await _karyawan
+          .where('name', isEqualTo: _userName)
+          .where('keterangan', isEqualTo: 'Masuk')
+          .where('status', isEqualTo: 'Terlambat')
+          .where('kategori', isEqualTo: 'Datang')
+          .get();
+
+      final QuerySnapshot izinDatangSnapshot = await _karyawan
           .where('name', isEqualTo: _userName)
           .where('keterangan', isEqualTo: 'Izin')
+          .where('kategori', isEqualTo: 'Datang')
           .get();
 
-      final QuerySnapshot sakitSnapshot = await _karyawan
+      final QuerySnapshot izinPulangSnapshot = await _karyawan
           .where('name', isEqualTo: _userName)
-          .where('keterangan', isEqualTo: 'Sakit')
+          .where('keterangan', isEqualTo: 'Izin')
+          .where('kategori', isEqualTo: 'Pulang')
           .get();
 
-      totalMasuk =
-          countEntriesWithinMonthYear(masukSnapshot.docs, now.year, now.month);
-      totalIzin =
-          countEntriesWithinMonthYear(izinSnapshot.docs, now.year, now.month);
-      totalSakit =
-          countEntriesWithinMonthYear(sakitSnapshot.docs, now.year, now.month);
+      final QuerySnapshot pulangBiasaSnapshot = await _karyawan
+          .where('name', isEqualTo: _userName)
+          .where('keterangan', isEqualTo: 'Tidak Lembur')
+          .where('kategori', isEqualTo: 'Pulang')
+          .get();
+
+      final QuerySnapshot pulangLemburSnapshot = await _karyawan
+          .where('name', isEqualTo: _userName)
+          .where('keterangan', isEqualTo: 'Lembur')
+          .where('kategori', isEqualTo: 'Pulang')
+          .get();
+
+      totalTepatWaktuDatang = countEntriesWithinMonthYear(tepatWaktuDatangSnapshot.docs, now.year, now.month);
+      totalTerlambatDatang = countEntriesWithinMonthYear(telatDatangSnapshot.docs, now.year, now.month);
+      totalIzinDatang = countEntriesWithinMonthYear(izinDatangSnapshot.docs, now.year, now.month);
+      totalPulangBiasa = countEntriesWithinMonthYear(pulangBiasaSnapshot.docs, now.year, now.month);
+      totalLembur = countEntriesWithinMonthYear(pulangLemburSnapshot.docs, now.year, now.month);
+      totalIzinPulang = countEntriesWithinMonthYear(izinPulangSnapshot.docs, now.year, now.month);
 
       setState(() {});
     } catch (error) {
@@ -164,59 +197,55 @@ class _HomeState extends State<Home> {
                       (context, index) {
                         final DocumentSnapshot documentSnapshot =
                             streamSnapshot.data!.docs[index];
-
-                        return Dismissible(
-                            key: UniqueKey(),
-                            onDismissed: (direction) {},
-                            child: ListTile(
-                              leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.network(
-                                  documentSnapshot['image'],
-                                  width: 60,
-                                  height: 80,
-                                  fit: BoxFit.cover,
+                        return ListTile(
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(
+                              documentSnapshot['image'],
+                              width: 60,
+                              height: 80,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          title: Text(
+                            documentSnapshot['name'],
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          subtitle: Text(
+                            _getFormattedTimestamp(
+                                documentSnapshot['timestamps']),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                documentSnapshot['kategori'],
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: Colors.black,
                                 ),
                               ),
-                              title: Text(
-                                documentSnapshot['name'],
+                              Text(
+                                documentSnapshot['status'],
                                 style: TextStyle(
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 17,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              subtitle: Text(
-                                _getFormattedTimestamp(
-                                    documentSnapshot['timestamps']),
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              trailing: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    documentSnapshot['kategori'],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  Text(
+                                  color: getStatusColor(
                                     documentSnapshot['status'],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 17,
-                                      color: getStatusColor(
-                                        documentSnapshot['status'],
-                                      ),
-                                    ),
                                   ),
-                                ],
+                                ),
                               ),
-                            ));
+                            ],
+                          ),
+                        );
                       },
                       childCount:
                           getNumberLength(streamSnapshot.data!.docs.length),
@@ -280,7 +309,8 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 35, left: 10, right: 10),
+                        padding:
+                            const EdgeInsets.only(top: 35, left: 10, right: 10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -325,6 +355,7 @@ class _HomeState extends State<Home> {
           left: 37,
           right: 37,
           child: Container(
+            height: 200,
             width: 320,
             decoration: BoxDecoration(
               boxShadow: [
@@ -338,141 +369,295 @@ class _HomeState extends State<Home> {
               color: Color(0xFF1A73E8),
               borderRadius: BorderRadius.circular(15),
             ),
-            child: SingleChildScrollView(
-              // Tambahkan widget SingleChildScrollView di sini
-              child: Column(
-                children: [
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 8,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 7),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 11, right: 11),
-                    child: Text(
-                      'Rekapitulasi Absensi ${DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now())}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(right: 15, left: 15, bottom: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            children: [
-                              CircleAvatar(
-                                  radius: 13,
-                                  backgroundColor: Colors.white,
-                                  child: Image.asset('images/m.png')),
-                              SizedBox(height: 7),
-                              Text(
-                                'Masuk',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                  color: Color.fromARGB(255, 216, 216, 216),
-                                ),
-                              ),
-                              SizedBox(height: 6),
-                              Text(
-                                '$totalMasuk Hari',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 17,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              CircleAvatar(
-                                  radius: 13,
-                                  backgroundColor: Colors.white,
-                                  child: Image.asset('images/i.png')),
-                              SizedBox(height: 7),
-                              Text(
-                                'Izin',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                  color: Color.fromARGB(255, 216, 216, 216),
-                                ),
-                              ),
-                              SizedBox(height: 6),
-                              Text(
-                                '$totalIzin Hari',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 17,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              CircleAvatar(
-                                  radius: 13,
-                                  backgroundColor: Colors.white,
-                                  child: Image.asset('images/s.png')),
-                              SizedBox(height: 7),
-                              Text(
-                                'Sakit',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                  color: Color.fromARGB(255, 216, 216, 216),
-                                ),
-                              ),
-                              SizedBox(height: 6),
-                              Text(
-                                '$totalSakit Hari',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 17,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            child: GestureDetector(
+            onHorizontalDragEnd: (DragEndDetails details) {
+              if (details.primaryVelocity! > 0) {
+                _pageController.previousPage(
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                );
+              } else {
+                _pageController.nextPage(
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                );
+              }
+            },
+            child: PageView(
+              controller: _pageController,
+              physics: NeverScrollableScrollPhysics(),
+              children: [
+                rekap_datang(),
+                rekap_pulang(),
+              ],
             ),
+          ),
           ),
         )
       ],
     );
   }
+
+  Widget rekap_datang() {
+    return Column(
+      children: [
+        SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 8,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 7),
+        Padding(
+          padding: const EdgeInsets.only(left: 11, right: 11),
+          child: Text(
+            'Rekapitulasi Kedatangan ${DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now())}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(right: 15, left: 15, bottom: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                          radius: 13,
+                          backgroundColor: Colors.white,
+                          child: Image.asset('images/m.png')),
+                      SizedBox(height: 7),
+                      Text(
+                        'Tepat Waktu',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          color: Color.fromARGB(255, 216, 216, 216),
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        '$totalTepatWaktuDatang Hari',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 17,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                          radius: 13,
+                          backgroundColor: Colors.white,
+                          child: Image.asset('images/i.png')),
+                      SizedBox(height: 7),
+                      Text(
+                        'Terlambat',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          color: Color.fromARGB(255, 216, 216, 216),
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        '$totalTerlambatDatang Hari',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 17,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                          radius: 13,
+                          backgroundColor: Colors.white,
+                          child: Image.asset('images/s.png')),
+                      SizedBox(height: 7),
+                      Text(
+                        'Izin',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          color: Color.fromARGB(255, 216, 216, 216),
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        '$totalIzinDatang Hari',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 17,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget rekap_pulang() {
+    return Column(
+      children: [
+        SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 8,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 7),
+        Padding(
+          padding: const EdgeInsets.only(left: 11, right: 11),
+          child: Text(
+            'Rekapitulasi Kepulangan ${DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now())}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.only(right: 15, left: 15, bottom: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                        radius: 13,
+                        backgroundColor: Colors.white,
+                        child: Image.asset('images/m.png')),
+                    SizedBox(height: 7),
+                    Text(
+                      'Normal',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                        color: Color.fromARGB(255, 216, 216, 216),
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      '$totalPulangBiasa Hari',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 17,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                        radius: 13,
+                        backgroundColor: Colors.white,
+                        child: Image.asset('images/i.png')),
+                    SizedBox(height: 7),
+                    Text(
+                      'Izin',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                        color: Color.fromARGB(255, 216, 216, 216),
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      '$totalIzinPulang Hari',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 17,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                        radius: 13,
+                        backgroundColor: Colors.white,
+                        child: Image.asset('images/s.png')),
+                    SizedBox(height: 7),
+                    Text(
+                      'Lembur',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                        color: Color.fromARGB(255, 216, 216, 216),
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      '$totalLembur Hari',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 17,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+  
 
   Color getStatusColor(String status) {
     if (status == 'Tepat Waktu') {
