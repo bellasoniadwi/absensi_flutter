@@ -27,6 +27,7 @@ class _Add_ScreenState extends State<Add_Screen> {
   String imageUrl = '';
   String _imagePath = '';
   bool _isSaving = false;
+  bool isExist = false;
 
   String? _selectedValueMasuk;
   List<String> listOfMasuk = ['Masuk', 'Izin'];
@@ -93,8 +94,7 @@ class _Add_ScreenState extends State<Add_Screen> {
             background_container(context),
             Positioned(
               top: 90,
-              child: 
-              containerToDisplay,
+              child: containerToDisplay,
             ),
           ],
         ),
@@ -234,7 +234,6 @@ class _Add_ScreenState extends State<Add_Screen> {
                 status = 'Tepat Waktu';
               }
 
-              // Get current latitude and longitude
               _currentLocation = await _getCurrentLocation();
               if (_currentLocation!.accuracy < 10) {
                 setState(() {
@@ -263,6 +262,18 @@ class _Add_ScreenState extends State<Add_Screen> {
               }
 
               if (keterangan == "Masuk" || keterangan == "Izin") {
+                bool dataExists = await checkIfDataExistsPulang(name, "Datang");
+                if (dataExists) {
+                  setState(() {
+                    _isSaving = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                        'Anda tidak dapat menambahkan data absensi karena sudah tersimpan sebelumnya'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                  return;
+                }
                 Uint8List imageBytes = await File(_imagePath).readAsBytes();
                 String uniqueFileName =
                     DateTime.now().millisecondsSinceEpoch.toString();
@@ -280,11 +291,9 @@ class _Add_ScreenState extends State<Add_Screen> {
 
                 String imageUrl = await referenceImageToUpload.getDownloadURL();
 
-                // Generate custom id : decrement
                 int docCustom =
                     3000000000000 - DateTime.now().millisecondsSinceEpoch;
                 String docId = docCustom.toString();
-                // Create a reference to the document using the custom ID
                 DocumentReference documentReference = _karyawan.doc(docId);
 
                 await documentReference.set({
@@ -359,7 +368,6 @@ class _Add_ScreenState extends State<Add_Screen> {
               String latitude = '';
               String longitude = '';
 
-              // Get current latitude and longitude
               _currentLocation = await _getCurrentLocation();
               if (_currentLocation!.accuracy < 10) {
                 setState(() {
@@ -388,6 +396,19 @@ class _Add_ScreenState extends State<Add_Screen> {
               }
 
               if (keterangan == "Tidak Lembur" || keterangan == "Izin") {
+                bool dataExists = await checkIfDataExistsPulang(name, "Pulang");
+                if (dataExists) {
+                  setState(() {
+                    _isSaving = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                        'Anda tidak dapat menambahkan data absensi karena sudah tersimpan sebelumnya'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                  return;
+                }
+
                 Uint8List imageBytes = await File(_imagePath).readAsBytes();
                 String uniqueFileName =
                     DateTime.now().millisecondsSinceEpoch.toString();
@@ -405,11 +426,9 @@ class _Add_ScreenState extends State<Add_Screen> {
 
                 String imageUrl = await referenceImageToUpload.getDownloadURL();
 
-                // Generate custom id : decrement
                 int docCustom =
                     3000000000000 - DateTime.now().millisecondsSinceEpoch;
                 String docId = docCustom.toString();
-                // Create a reference to the document using the custom ID
                 DocumentReference documentReference = _karyawan.doc(docId);
 
                 await documentReference.set({
@@ -483,7 +502,6 @@ class _Add_ScreenState extends State<Add_Screen> {
               String latitude = '';
               String longitude = '';
 
-              // Get current latitude and longitude
               _currentLocation = await _getCurrentLocation();
               if (_currentLocation!.accuracy < 10) {
                 setState(() {
@@ -511,6 +529,19 @@ class _Add_ScreenState extends State<Add_Screen> {
                 return;
               }
 
+              bool dataExists = await checkIfDataExistsPulang(name, "Pulang");
+              if (dataExists) {
+                setState(() {
+                  _isSaving = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(
+                      'Anda tidak dapat menambahkan data absensi karena sudah tersimpan sebelumnya'),
+                  backgroundColor: Colors.blueAccent,
+                ));
+                return;
+              }
+
               Uint8List imageBytes = await File(_imagePath).readAsBytes();
               String uniqueFileName =
                   DateTime.now().millisecondsSinceEpoch.toString();
@@ -525,11 +556,9 @@ class _Add_ScreenState extends State<Add_Screen> {
 
               String imageUrl = await referenceImageToUpload.getDownloadURL();
 
-              // Generate custom id : decrement
               int docCustom =
                   3000000000000 - DateTime.now().millisecondsSinceEpoch;
               String docId = docCustom.toString();
-              // Create a reference to the document using the custom ID
               DocumentReference documentReference = _karyawan.doc(docId);
 
               await documentReference.set({
@@ -896,7 +925,49 @@ class _Add_ScreenState extends State<Add_Screen> {
   }
 
   // FUNGSI - FUNGSI
-  // Fungsi Pick Image tanpa menyimpan ke Firebase
+  Future<bool> checkIfDataExistsDatang(String name, String kategori) async {
+    final DateTime now = DateTime.now();
+
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('karyawans')
+        .where('name', isEqualTo: name)
+        .where('kategori', isEqualTo: kategori)
+        .get();
+
+    isExist = checkAbsenToday(querySnapshot.docs, now.year, now.month, now.day);
+
+    return isExist;
+  }
+
+  Future<bool> checkIfDataExistsPulang(String name, String kategori) async {
+    final DateTime now = DateTime.now();
+
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('karyawans')
+        .where('name', isEqualTo: name)
+        .where('kategori', isEqualTo: kategori)
+        .get();
+
+    isExist = checkAbsenToday(querySnapshot.docs, now.year, now.month, now.day);
+
+    return isExist;
+  }
+
+  bool checkAbsenToday(
+      List<QueryDocumentSnapshot> documents, int year, int month, int day) {
+    bool absenExist = false;
+    for (var doc in documents) {
+      DateTime docTimestamp = (doc['timestamps'] as Timestamp).toDate();
+      if (docTimestamp.year == year &&
+          docTimestamp.month == month &&
+          docTimestamp.day == day) {
+        absenExist = true;
+      }
+    }
+
+    return absenExist;
+  }
+
   Future<void> _pickAndSetImage() async {
     ImagePicker imagePicker = ImagePicker();
     XFile? file = await imagePicker.pickImage(source: ImageSource.camera);
@@ -933,24 +1004,14 @@ class _Add_ScreenState extends State<Add_Screen> {
     return file;
   }
 
-  // Fungsi Pembantu Image untuk mengatur imageUrl dengan menggunakan setState.
-  void _setImageUrl(String imageUrl) {
-    setState(() {
-      this.imageUrl = imageUrl;
-    });
-  }
-
-  // Komponen Pengambilan Lokasi Saat Ini
   Position? _currentLocation;
   late bool servicePermission = false;
   late LocationPermission permission;
   Future<Position> _getCurrentLocation() async {
-    // check if we have permission to access location service
     servicePermission = await Geolocator.isLocationServiceEnabled();
     if (!servicePermission) {
       print("Service Disabled");
     }
-    // service enabled
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
