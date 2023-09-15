@@ -30,6 +30,7 @@ class _HomeState extends State<Home> {
   int totalLembur = 0;
   int totalIzinPulang = 0;
   PageController _pageController = PageController(initialPage: 0);
+  bool firstPage = true;
 
   @override
   void dispose() {
@@ -362,7 +363,6 @@ class _HomeState extends State<Home> {
           left: 37,
           right: 37,
           child: Container(
-            height: 200,
             width: 320,
             decoration: BoxDecoration(
               boxShadow: [
@@ -376,31 +376,9 @@ class _HomeState extends State<Home> {
               color: Color(0xFF1A73E8),
               borderRadius: BorderRadius.circular(15),
             ),
-            child: GestureDetector(
-              onHorizontalDragEnd: (DragEndDetails details) {
-                if (details.primaryVelocity! > 0) {
-                  _pageController.previousPage(
-                    duration: Duration(milliseconds: 500),
-                    curve: Curves.easeInOut,
-                  );
-                } else {
-                  _pageController.nextPage(
-                    duration: Duration(milliseconds: 500),
-                    curve: Curves.easeInOut,
-                  );
-                }
-              },
-              child: PageView(
-                controller: _pageController,
-                physics: NeverScrollableScrollPhysics(),
-                children: [
-                  rekap_datang(),
-                  rekap_pulang(),
-                ],
-              ),
-            ),
+            child: firstPage ? rekap_datang() : rekap_pulang(),
           ),
-        )
+        ),
       ],
     );
   }
@@ -438,110 +416,29 @@ class _HomeState extends State<Home> {
           ),
         ),
         SizedBox(height: 20),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(right: 15, left: 15, bottom: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                          radius: 15,
-                          backgroundColor: Colors.white,
-                          child: Icon(
-                            FontAwesomeIcons.thumbsUp,
-                            color: Color(0xFF1A73E8),
-                            size: 18,
-                          ),),
-                      SizedBox(height: 7),
-                      Text(
-                        'Tepat Waktu',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                          color: Color.fromARGB(255, 216, 216, 216),
-                        ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        '$totalTepatWaktuDatang Hari',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 17,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                          radius: 15,
-                          backgroundColor: Colors.white,
-                          child: Icon(
-                            FontAwesomeIcons.thumbsDown,
-                            color: Color(0xFF1A73E8),
-                            size: 18,
-                          ),),
-                      SizedBox(height: 7),
-                      Text(
-                        'Terlambat',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                          color: Color.fromARGB(255, 216, 216, 216),
-                        ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        '$totalTerlambatDatang Hari',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 17,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                          radius: 15,
-                          backgroundColor: Colors.white,
-                          child: Icon(
-                            FontAwesomeIcons.handshake,
-                            color: Color(0xFF1A73E8),
-                            size: 18,
-                          ),),
-                      SizedBox(height: 7),
-                      Text(
-                        'Izin',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                          color: Color.fromARGB(255, 216, 216, 216),
-                        ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        '$totalIzinDatang Hari',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 17,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+        Padding(
+          padding: const EdgeInsets.only(right: 15, left: 15, bottom: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildArrowBack(),
+              _buildRekapColumn(
+                FontAwesomeIcons.thumbsUp,
+                'Tepat Waktu',
+                '$totalTepatWaktuDatang Hari',
+              ),
+              _buildRekapColumn(
+                FontAwesomeIcons.handshake,
+                'Izin',
+                '$totalIzinDatang Hari',
+              ),
+              _buildRekapColumn(
+                FontAwesomeIcons.thumbsDown,
+                'Terlambat',
+                '$totalTerlambatDatang Hari',
+              ),
+              _buildArrowForward(),
+            ],
           ),
         ),
       ],
@@ -586,100 +483,170 @@ class _HomeState extends State<Home> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                        radius: 15,
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          FontAwesomeIcons.thumbsUp,
-                          color: Color(0xFF1A73E8),
-                          size: 18,)),
-                    SizedBox(height: 7),
-                    Text(
-                      'Normal',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                        color: Color.fromARGB(255, 216, 216, 216),
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      '$totalPulangBiasa Hari',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 17,
-                        color: Colors.white,
-                      ),
+              _buildArrowBack(),
+              _buildRekapColumn(
+                FontAwesomeIcons.thumbsUp,
+                'Normal',
+                '$totalPulangBiasa Hari',
+              ),
+              _buildRekapColumn(
+                FontAwesomeIcons.handshake,
+                'Izin',
+                '$totalIzinPulang Hari',
+              ),
+              _buildRekapColumn(
+                FontAwesomeIcons.star,
+                'Lembur',
+                '$totalLembur Hari',
+              ),
+              _buildArrowForward()
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildArrowBack() {
+    return Column(
+      children: [
+        GestureDetector(
+          child: Stack(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.3),
+                      spreadRadius: 3,
+                      blurRadius: 9,
+                      offset: Offset(0, 1),
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                        radius: 15,
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          FontAwesomeIcons.handshake,
-                          color: Color(0xFF1A73E8),
-                          size: 18,)),
-                    SizedBox(height: 7),
-                    Text(
-                      'Izin',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                        color: Color.fromARGB(255, 216, 216, 216),
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      '$totalIzinPulang Hari',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 17,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                        radius: 15,
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          FontAwesomeIcons.star,
-                          color: Color(0xFF1A73E8),
-                          size: 18,)),
-                    SizedBox(height: 7),
-                    Text(
-                      'Lembur',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                        color: Color.fromARGB(255, 216, 216, 216),
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      '$totalLembur Hari',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 17,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
+              Icon(
+                FontAwesomeIcons.chevronLeft,
+                color: Colors.white,
+                size: 25,
               ),
             ],
+          ),
+          onTap: () {
+            setState(() {
+              firstPage = !firstPage;
+            });
+          },
+        ),
+        SizedBox(height: 7),
+        Text(
+          "",
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
+            color: Color.fromARGB(255, 216, 216, 216),
+          ),
+        ),
+        SizedBox(height: 6),
+        Text(
+          "",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 17,
+            color: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildArrowForward() {
+    return Column(
+      children: [
+        GestureDetector(
+          child: Stack(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.3),
+                      spreadRadius: 3,
+                      blurRadius: 9,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                FontAwesomeIcons.chevronRight,
+                color: Colors.white,
+                size: 25,
+              ),
+            ],
+          ),
+          onTap: () {
+            setState(() {
+              firstPage = !firstPage;
+            });
+          },
+        ),
+        SizedBox(height: 7),
+        Text(
+          "",
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
+            color: Color.fromARGB(255, 216, 216, 216),
+          ),
+        ),
+        SizedBox(height: 6),
+        Text(
+          "",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 17,
+            color: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRekapColumn(IconData icon, String title, String value) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 15,
+          backgroundColor: Colors.white,
+          child: Icon(
+            icon,
+            color: Color(0xFF1A73E8),
+            size: 18,
+          ),
+        ),
+        SizedBox(height: 7),
+        Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
+            color: Color.fromARGB(255, 216, 216, 216),
+          ),
+        ),
+        SizedBox(height: 6),
+        Text(
+          value,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 17,
+            color: Colors.white,
           ),
         ),
       ],
@@ -704,12 +671,9 @@ class _HomeState extends State<Home> {
 
   String _getFormattedTimestamp(Timestamp? timestamp) {
     if (timestamp == null) {
-      // Handle the case when 'timestamps' is null, set a default value or return an empty string
       return 'No Timestamp';
     }
-    // Convert the Timestamp to DateTime
     DateTime dateTime = timestamp.toDate();
-    // Format the DateTime as a human-readable string (change the format as desired)
     String formattedDateTime =
         DateFormat('dd-MM-yyyy HH:mm:ss').format(dateTime);
     return formattedDateTime;
