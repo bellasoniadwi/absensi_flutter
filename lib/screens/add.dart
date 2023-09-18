@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:absensi_flutter/models/user_data.dart';
+import 'package:absensi_flutter/widgets/bottomnavigationbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -326,7 +327,7 @@ class AddScreenState extends State<AddScreen> {
                     content: Text('Data Absensi anda berhasil tersimpan'),
                     backgroundColor: Colors.blueAccent,
                   ));
-                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Bottom()));
                 }
               } else {
                 setState(() {
@@ -467,7 +468,7 @@ class AddScreenState extends State<AddScreen> {
                     content: Text('Data Absensi anda berhasil tersimpan'),
                     backgroundColor: Colors.blueAccent,
                   ));
-                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Bottom()));
                 }
               } else {
                 setState(() {
@@ -605,7 +606,7 @@ class AddScreenState extends State<AddScreen> {
                   content: Text('Data Absensi anda berhasil tersimpan'),
                   backgroundColor: Colors.blueAccent,
                 ));
-                Navigator.pop(context);
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Bottom()));
               }
             },
       child: Container(

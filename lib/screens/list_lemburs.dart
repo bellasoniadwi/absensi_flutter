@@ -3,20 +3,23 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 
 class RiwayatLembur extends StatefulWidget {
   const RiwayatLembur({Key? key}) : super(key: key);
 
   @override
-  _RiwayatLemburState createState() => _RiwayatLemburState();
+  RiwayatLemburState createState() => RiwayatLemburState();
 }
 
-class _RiwayatLemburState extends State<RiwayatLembur> {
+class RiwayatLemburState extends State<RiwayatLembur> {
   final CollectionReference _lembur =
       FirebaseFirestore.instance.collection('lemburs');
   DateTime selectedDate = DateTime.now();
   String? _userName;
+  final logger = Logger();
 
+  @override
   void initState() {
     super.initState();
     fetchUserDataFromFirestore();
@@ -37,15 +40,17 @@ class _RiwayatLemburState extends State<RiwayatLembur> {
         }
       }
     } catch (error) {
-      print("Error fetching user data: $error");
+      logger.e("Error fetching user data: $error");
     }
   }
 
   Future<void> _deleteLembur(String lemburId) async {
     await _lembur.doc(lemburId).delete();
 
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Pengajuan lembur anda berhasil dihapus'), backgroundColor: Colors.blueAccent,));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Pengajuan lembur anda berhasil dihapus'), backgroundColor: Colors.blueAccent,));
+    }
   }
 
   @override
@@ -65,7 +70,7 @@ class _RiwayatLemburState extends State<RiwayatLembur> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        IntrinsicHeight(
+                        const IntrinsicHeight(
                           child: Stack(
                             children: [
                               Align(
@@ -115,7 +120,7 @@ class _RiwayatLemburState extends State<RiwayatLembur> {
                                                 height: 10,
                                               ),
                                               Text(documentSnapshot['name'],
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       fontSize: 18,
                                                       letterSpacing: 2.5,
                                                       fontWeight:
@@ -124,14 +129,13 @@ class _RiwayatLemburState extends State<RiwayatLembur> {
                                                   _getFormattedTimestamp(
                                                       documentSnapshot[
                                                           'timestamps']),
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       fontSize: 15,
                                                       letterSpacing: 1)),
                                               Row(
                                                 children: [
                                                   Text(
-                                                      '\n' +
-                                                          _getFormattedStatus(documentSnapshot['status']),
+                                                      '\n${_getFormattedStatus(documentSnapshot['status'])}',
                                                       style: TextStyle(
                                                         fontSize: 15,
                                                         letterSpacing: 1,

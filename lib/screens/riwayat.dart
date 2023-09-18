@@ -4,22 +4,24 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 
 class RiwayatAbsen extends StatefulWidget {
   const RiwayatAbsen({Key? key}) : super(key: key);
 
   @override
-  _RiwayatAbsenState createState() => _RiwayatAbsenState();
+  RiwayatAbsenState createState() => RiwayatAbsenState();
 }
 
-class _RiwayatAbsenState extends State<RiwayatAbsen> {
-  // Mendefinisikan variabel
+class RiwayatAbsenState extends State<RiwayatAbsen> {
   final CollectionReference _karyawan =
       FirebaseFirestore.instance.collection('karyawans');
   DateTime selectedDate = DateTime.now();
   String imageUrl = '';
   String? _userName;
+  final logger = Logger();
 
+  @override
   void initState() {
     super.initState();
     fetchUserDataFromFirestore();
@@ -29,7 +31,6 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        // Ambil data pengguna dari Firestore berdasarkan UID
         var userDoc = await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
@@ -41,7 +42,7 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
         }
       }
     } catch (error) {
-      print("Error fetching user data: $error");
+      logger.e("Error fetching user data: $error");
     }
   }
 
@@ -64,7 +65,7 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        IntrinsicHeight(
+                        const IntrinsicHeight(
                           child: Stack(
                             children: [
                               Align(
@@ -117,7 +118,7 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
                                                 height: 10,
                                               ),
                                               Text(documentSnapshot['name'],
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 fontSize: 18,
                                                 letterSpacing: 2.5,
                                                 fontWeight: FontWeight.bold)),
@@ -125,15 +126,14 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
                                                 _getFormattedTimestamp(
                                                     documentSnapshot[
                                                         'timestamps']),
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                 fontSize: 15,
                                                 letterSpacing: 1)
                                               ),
                                               Row(
                                                 children: [
                                                   Text(
-                                                        '\n'+documentSnapshot[
-                                                            'keterangan'],
+                                                    '\n${documentSnapshot['keterangan']}',
                                                     style: TextStyle(
                                                     fontSize: 15,
                                                     letterSpacing: 1,
@@ -141,15 +141,14 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
                                                       documentSnapshot['keterangan'],
                                                     ),)
                                                   ),
-                                                  Text(
+                                                  const Text(
                                                         '\n  -  ',
                                                     style: TextStyle(
                                                     fontSize: 15,
                                                     letterSpacing: 1,)
                                                   ),
                                                   Text(
-                                                        '\n'+documentSnapshot[
-                                                            'status'],
+                                                    '\n${documentSnapshot['status']}',
                                                     style: TextStyle(
                                                     fontSize: 15,
                                                     letterSpacing: 1,
@@ -170,9 +169,9 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
                                           child: Image.network(
                                           documentSnapshot['image'],
                                           width:
-                                              60, // Sesuaikan ukuran gambar sesuai kebutuhan Anda
+                                              60,
                                           height:
-                                              80, // Sesuaikan ukuran gambar sesuai kebutuhan Anda
+                                              80,
                                           fit: BoxFit.cover,
                                         ),
                                         ),
@@ -196,14 +195,14 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
             floatingActionButton: FloatingActionButton(
               onPressed: () {
                 Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Bottom()))
+                        MaterialPageRoute(builder: (context) => const Bottom()))
                     .then((data) {});
               },
+              backgroundColor: Colors.blueAccent,
               child: const Icon(
                 Icons.arrow_back,
                 color: Colors.white,
               ),
-              backgroundColor: Colors.blueAccent,
             ),
       ),
     );
@@ -211,12 +210,9 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
 
   String _getFormattedTimestamp(Timestamp? timestamp) {
     if (timestamp == null) {
-      // Handle the case when 'timestamps' is null, set a default value or return an empty string
       return 'No Timestamp';
     }
-    // Convert the Timestamp to DateTime
     DateTime dateTime = timestamp.toDate();
-    // Format the DateTime as a human-readable string (change the format as desired)
     String formattedDateTime =
         DateFormat('dd-MM-yyyy HH:mm:ss').format(dateTime);
     return formattedDateTime;
