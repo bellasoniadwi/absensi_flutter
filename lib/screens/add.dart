@@ -12,14 +12,14 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:image/image.dart' as img;
 
-class Add_Screen extends StatefulWidget {
-  const Add_Screen({super.key});
+class AddScreen extends StatefulWidget {
+  const AddScreen({super.key});
 
   @override
-  State<Add_Screen> createState() => _Add_ScreenState();
+  State<AddScreen> createState() => AddScreenState();
 }
 
-class _Add_ScreenState extends State<Add_Screen> {
+class AddScreenState extends State<AddScreen> {
   final CollectionReference _karyawan =
       FirebaseFirestore.instance.collection('karyawans');
   final TextEditingController _nameController = TextEditingController();
