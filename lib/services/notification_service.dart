@@ -5,8 +5,7 @@ import 'package:timezone/timezone.dart' as tz;
 class NotificationsServices {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  final AndroidInitializationSettings _androidInitializationSettings =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+  final AndroidInitializationSettings _androidInitializationSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
 
   NotificationsServices() {
     initializeNotifications();
