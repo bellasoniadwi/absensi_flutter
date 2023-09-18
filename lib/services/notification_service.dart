@@ -87,7 +87,7 @@ class NotificationsServices {
       notificationDetails,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      androidAllowWhileIdle: true,
+      // androidAllowWhileIdle: true,
       matchDateTimeComponents: DateTimeComponents.time,
     );
 
@@ -99,7 +99,7 @@ class NotificationsServices {
       notificationDetails,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      androidAllowWhileIdle: true,
+      // androidAllowWhileIdle: true,
       matchDateTimeComponents: DateTimeComponents.time,
     );
 
@@ -111,7 +111,7 @@ class NotificationsServices {
       notificationDetails,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      androidAllowWhileIdle: true,
+      // androidAllowWhileIdle: true,
       matchDateTimeComponents: DateTimeComponents.time,
     );
 
@@ -123,7 +123,7 @@ class NotificationsServices {
       notificationDetails,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      androidAllowWhileIdle: true,
+      // androidAllowWhileIdle: true,
       matchDateTimeComponents: DateTimeComponents.time,
     );
 
@@ -135,7 +135,7 @@ class NotificationsServices {
       notificationDetails,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      androidAllowWhileIdle: true,
+      // androidAllowWhileIdle: true,
       matchDateTimeComponents: DateTimeComponents.time,
     );
 
@@ -147,7 +147,7 @@ class NotificationsServices {
       notificationDetails,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      androidAllowWhileIdle: true,
+      // androidAllowWhileIdle: true,
       matchDateTimeComponents: DateTimeComponents.time,
     );
   }

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:logger/logger.dart';
 
 class ProfilePage extends StatefulWidget {
   final DocumentSnapshot? documentSnapshot;
@@ -27,6 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _nomorindukController = TextEditingController();
   final CollectionReference _users = FirebaseFirestore.instance.collection('users');
+  final logger = Logger();
 
   String imageUrl = '';
   String _imagePath = '';
@@ -34,6 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isImageChanged = false;
   bool _isLoading = false;
 
+  @override
   void initState() {
     super.initState();
     fetchUserDataFromFirestore();
@@ -51,13 +54,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // Fungsi Pembantu Image untuk mengatur imageUrl dengan menggunakan setState.
-  void _setImageUrl(String imageUrl) {
-    setState(() {
-      this.imageUrl = imageUrl;
-    });
-  }
-
   Future<void> fetchUserDataFromFirestore() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -71,19 +67,21 @@ class _ProfilePageState extends State<ProfilePage> {
           String email = userDoc.data()?['email'] ?? '';
           String jabatan = userDoc.data()?['jabatan'] ?? '';
           String image = userDoc.data()?['image'] ?? '';
-          String nomor_induk = userDoc.data()?['nomor_induk'] ?? '';
+          String nomorInduk = userDoc.data()?['nomor_induk'] ?? '';
           String telepon = userDoc.data()?['telepon'] ?? '';
           _jabatanController.text = jabatan;
           _emailController.text = email;
           _teleponController.text = telepon;
           _nameController.text = name;
-          _nomorindukController.text = nomor_induk;
-          Provider.of<UserData>(context, listen: false).updateUserData(
-              name, email, jabatan, image, nomor_induk, telepon);
+          _nomorindukController.text = nomorInduk;
+          if (mounted) {
+            Provider.of<UserData>(context, listen: false).updateUserData(
+                name, email, jabatan, image, nomorInduk, telepon);
+          }
         }
       }
     } catch (error) {
-      print("Error fetching user data: $error");
+      logger.e("Error fetching user data: $error");
     }
   }
 
@@ -95,11 +93,11 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Stack(
           alignment: AlignmentDirectional.center,
           children: [
-            background_container(context),
+            backgroundContainer(context),
             SingleChildScrollView(
               child: Positioned(
                 top: 90,
-                child: main_container(),
+                child: mainContainer(),
               ),
             ),
           ],
@@ -108,13 +106,13 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Column background_container(BuildContext context) {
+  Column backgroundContainer(BuildContext context) {
     return Column(
       children: [
         Container(
           width: double.infinity,
           height: 240,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Color(0xFF1A73E8),
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(20),
@@ -123,9 +121,9 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           child: Column(
             children: [
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,12 +133,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => Bottom()))
+                                    builder: (context) => const Bottom()))
                             .then((data) {});
                       },
-                      child: Icon(Icons.arrow_back, color: Colors.white),
+                      child: const Icon(Icons.arrow_back, color: Colors.white),
                     ),
-                    Text(
+                    const Text(
                       'Profil Saya',
                       style: TextStyle(
                           fontSize: 20,
@@ -157,7 +155,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Container main_container() {
+  Container mainContainer() {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -169,7 +167,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           children: <Widget>[
             foto(),
-            SizedBox(
+            const SizedBox(
               height: 20,
               width: 200,
               child: Divider(
@@ -182,7 +180,7 @@ class _ProfilePageState extends State<ProfilePage> {
             jabatan(),
             telepon(),
             update(),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
           ],
         ),
       ),
@@ -205,7 +203,7 @@ class _ProfilePageState extends State<ProfilePage> {
           width: 4,
         ),
         borderRadius: BorderRadius.circular(125),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black,
             blurRadius: 3,
@@ -229,13 +227,13 @@ class _ProfilePageState extends State<ProfilePage> {
           Align(
             alignment: Alignment.bottomRight,
             child: Container(
-              margin: EdgeInsets.all(8.0),
+              margin: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
                 color: Colors.blueAccent,
                 borderRadius: BorderRadius.circular(50),
               ),
               child: IconButton(
-                icon: Icon(Icons.camera_alt, color: Colors.white),
+                icon: const Icon(Icons.camera_alt, color: Colors.white),
                 onPressed: () => _pickImage(),
               ),
             ),
@@ -268,7 +266,7 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: const EdgeInsets.only(left: 25, right: 25, bottom: 15),
       child: TextField(
         controller: _nameController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Nama',
           labelStyle: TextStyle(
             color: Colors.blueAccent,
@@ -280,7 +278,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           border: OutlineInputBorder(),
         ),
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.blueAccent,
           fontSize: 20,
           fontFamily: "Source Sans Pro",
@@ -309,7 +307,7 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: const EdgeInsets.only(left: 25, right: 25, bottom: 15),
       child: TextField(
         controller: _nomorindukController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Nomor Induk',
           labelStyle: TextStyle(
             color: Colors.blueAccent,
@@ -321,7 +319,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           border: OutlineInputBorder(),
         ),
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.blueAccent,
           fontSize: 20,
           fontFamily: "Source Sans Pro",
@@ -336,7 +334,7 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: const EdgeInsets.only(left: 25, right: 25, bottom: 15),
       child: TextField(
         controller: _emailController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Email',
           labelStyle: TextStyle(
             color: Colors.blueAccent,
@@ -348,7 +346,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           border: OutlineInputBorder(),
         ),
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.blueAccent,
           fontSize: 20,
           fontFamily: "Source Sans Pro",
@@ -363,7 +361,7 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: const EdgeInsets.only(left: 25, right: 25, bottom: 15),
       child: TextField(
         controller: _jabatanController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Jabatan',
           labelStyle: TextStyle(
             color: Colors.blueAccent,
@@ -375,7 +373,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           border: OutlineInputBorder(),
         ),
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.blueAccent,
           fontSize: 20,
           fontFamily: "Source Sans Pro",
@@ -389,7 +387,7 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: const EdgeInsets.only(left: 25, right: 25, bottom: 15),
       child: TextField(
         controller: _teleponController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Telepon',
           labelStyle: TextStyle(
             color: Colors.blueAccent,
@@ -401,7 +399,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           border: OutlineInputBorder(),
         ),
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.blueAccent,
           fontSize: 20,
           fontFamily: "Source Sans Pro",
@@ -415,22 +413,16 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: const EdgeInsets.only(left: 25, right: 25, top: 25),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          primary: Colors.blueAccent,
+          backgroundColor: Colors.blueAccent,
           minimumSize: const Size.fromHeight(50),
           shape: RoundedRectangleBorder(
-            side: BorderSide(
+            side: const BorderSide(
               color: Color.fromARGB(255, 219, 241, 251),
               width: 2.0,
             ),
             borderRadius: BorderRadius.circular(4),
           ),
         ),
-        child: _isLoading
-            ? CircularProgressIndicator()
-            : Text(
-                'Update Data Profile',
-                style: TextStyle(color: Colors.white),
-              ),
         onPressed: _isLoading
             ? null
             : () async {
@@ -445,11 +437,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   String formattedDateTime =
                       DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-                  String fileName = 'images/' +
-                      uniqueFileName +
-                      '_' +
-                      formattedDateTime +
-                      '.jpg';
+                  String fileName = 'images/$uniqueFileName-$formattedDateTime.jpg';
+
                   Reference referenceImageToUpload =
                       FirebaseStorage.instance.ref().child(fileName);
                   await referenceImageToUpload.putData(imageBytes);
@@ -476,27 +465,36 @@ class _ProfilePageState extends State<ProfilePage> {
                         .doc(widget.documentSnapshot!.id)
                         .update(updatedData);
 
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Profil anda berhasil diubah'),
-                      backgroundColor: Colors.blueAccent,
-                    ));
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => Bottom()));
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Profil anda berhasil diubah'),
+                        backgroundColor: Colors.blueAccent,
+                      ));
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => const Bottom()));
+                    }
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Document snapshot is null'),
-                      backgroundColor: Colors.red,
-                    ));
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Document snapshot is null'),
+                        backgroundColor: Colors.red,
+                      ));
+                    }
                   }
-                  ;
                 } catch (error) {
-                  print("Error updating profile: $error");
+                  logger.e("Error updating profile: $error");
                 } finally {
                   setState(() {
                     _isLoading = false;
                   });
                 }
               },
+          child: _isLoading
+            ? const CircularProgressIndicator()
+            : const Text(
+                'Update Data Profile',
+                style: TextStyle(color: Colors.white),
+              ),
       ),
     );
   }
