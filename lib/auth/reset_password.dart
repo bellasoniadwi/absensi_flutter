@@ -3,6 +3,7 @@ import 'package:absensi_flutter/reusable_item/color.dart';
 import 'package:absensi_flutter/reusable_item/widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 class ResetPassword extends StatefulWidget {
   const ResetPassword({super.key});
@@ -12,7 +13,8 @@ class ResetPassword extends StatefulWidget {
 }
 
 class _ResetPasswordState extends State<ResetPassword> {
-  TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
+  final logger = Logger();
 
   @override
   void dispose(){
@@ -23,15 +25,17 @@ class _ResetPasswordState extends State<ResetPassword> {
   Future passwordReset() async {
     try{
       await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailTextController.text.trim());
-      showDialog(
-        context: context, 
-        builder: (context){
-          return AlertDialog(
-            content: Text('Link reset password telah dikirim. Cek email anda!'),
-          );
-        });
+      if (mounted) {
+        showDialog(
+          context: context, 
+          builder: (context){
+            return const AlertDialog(
+              content: Text('Link reset password telah dikirim. Cek email anda!'),
+            );
+          });
+      }
     } on FirebaseAuthException catch (e) {
-      print(e);
+      logger.e(e);
       showDialog(
         context: context, 
         builder: (context){
@@ -60,15 +64,15 @@ class _ResetPasswordState extends State<ResetPassword> {
               20, MediaQuery.of(context).size.height * 0.2, 20, 0),
           child: Column(children: <Widget>[
             logoWidget("images/logo1.png"),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Text(
+            const Text(
               "Masukkan email anda dan kami akan mengirimkan link reset password",
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             reusableTextField(
@@ -76,7 +80,7 @@ class _ResetPasswordState extends State<ResetPassword> {
               Icons.mail,
               controller: _emailTextController,
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             Container(
@@ -86,11 +90,6 @@ class _ResetPasswordState extends State<ResetPassword> {
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(90)),
               child: ElevatedButton(
                 onPressed: passwordReset,
-                child: Text(
-                  'RESET PASSWORD',
-                  style: const TextStyle(
-                      color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16),
-                ),
                 style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.resolveWith((states) {
                       if (states.contains(MaterialState.pressed)) {
@@ -100,9 +99,14 @@ class _ResetPasswordState extends State<ResetPassword> {
                     }),
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+                child: const Text(
+                  'RESET PASSWORD',
+                  style: TextStyle(
+                      color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16),
+                ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             Padding(
@@ -115,7 +119,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                       Navigator.push(
                         context, 
                         MaterialPageRoute(builder: (context) {
-                          return SignInScreen();
+                          return const SignInScreen();
                         },
                         )
                       );

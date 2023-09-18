@@ -2,6 +2,7 @@ import 'package:absensi_flutter/widgets/bottomnavigationbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:absensi_flutter/auth/reset_password.dart';
 import 'package:absensi_flutter/reusable_item/color.dart';
+import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:absensi_flutter/models/user_data.dart';
 import 'package:absensi_flutter/reusable_item/widget.dart';
@@ -17,10 +18,11 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _passwordTextController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
+  final logger = Logger();
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +42,7 @@ class _SignInScreenState extends State<SignInScreen> {
               20, MediaQuery.of(context).size.height * 0.2, 20, 0),
           child: Column(children: <Widget>[
             logoWidget("images/logo1.png"),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             reusableTextField(
@@ -48,7 +50,7 @@ class _SignInScreenState extends State<SignInScreen> {
               Icons.mail,
               controller: _emailTextController,
             ),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             reusableTextField(
@@ -63,12 +65,12 @@ class _SignInScreenState extends State<SignInScreen> {
                 });
               },
             ),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             AuthButton(context, true, _isLoading, () async {
               setState(() {
-                _isLoading = true; // Set loading state to true
+                _isLoading = true; 
               });
 
               try {
@@ -92,41 +94,49 @@ class _SignInScreenState extends State<SignInScreen> {
                     String image = userDoc.data()?['image'] ?? '';
                     String nomor_induk = userDoc.data()?['nomor_induk'] ?? '';
                     String telepon = userDoc.data()?['telepon'] ?? '';
-                    Provider.of<UserData>(context, listen: false)
-                        .updateUserData(
-                            userCredential.user?.displayName ?? "Guest",
-                            userCredential.user?.email ?? "guest@example.com",
-                            jabatan,
-                            image,
-                            nomor_induk,
-                            telepon);
+                    if (mounted) {
+                      Provider.of<UserData>(context, listen: false)
+                          .updateUserData(
+                              userCredential.user?.displayName ?? "Guest",
+                              userCredential.user?.email ?? "guest@example.com",
+                              jabatan,
+                              image,
+                              nomor_induk,
+                              telepon);
+                    }
 
                     // Set status login sebagai true saat pengguna berhasil login
                     final SharedPreferences prefs =
                         await SharedPreferences.getInstance();
                     prefs.setBool('isLoggedIn', true);
 
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Bottom()));
+                    if (mounted) {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => const Bottom()));
+                    }
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            'Anda tidak diperkenankan untuk login. Mohon untuk menghubungi admin.'),
-                            backgroundColor: Colors.blueAccent,));
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text(
+                              'Anda tidak diperkenankan untuk login. Mohon untuk menghubungi admin.'),
+                              backgroundColor: Colors.blueAccent,));
+                    }
                   }
                 }
               } catch (error) {
-                print("Authentication Error: ${error.toString()}");
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Invalid Email or Password'),
-                    backgroundColor: Colors.blueAccent,));
+                logger.e("Authentication Error: ${error.toString()}");
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Invalid Email or Password'),
+                      backgroundColor: Colors.blueAccent,));
+                }
               } finally {
                 setState(() {
                   _isLoading = false; // Set loading state back to false
                 });
               }
             }),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             Padding(
@@ -139,7 +149,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       Navigator.push(
                         context, 
                         MaterialPageRoute(builder: (context) {
-                          return ResetPassword();
+                          return const ResetPassword();
                         },
                         )
                       );
