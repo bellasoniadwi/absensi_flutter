@@ -1,6 +1,7 @@
 import 'package:absensi_flutter/auth/signin_screen.dart';
 import 'package:absensi_flutter/models/user_data.dart';
 import 'package:absensi_flutter/screens/riwayat.dart';
+import 'package:absensi_flutter/services/notification_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ class _HomeState extends State<Home> {
   int totalIzinPulang = 0;
   PageController _pageController = PageController(initialPage: 0);
   bool firstPage = true;
+  NotificationsServices notificationsServices = NotificationsServices();
 
   @override
   void dispose() {
@@ -43,6 +45,13 @@ class _HomeState extends State<Home> {
     super.initState();
     initializeDateFormatting("id_ID", null);
     fetchUserDataFromFirestore();
+    notificationsServices.initializeNotifications();
+    notificationsServices.scheduleNotification();
+    _scheduleAutomaticNotifications();
+  }
+
+  void _scheduleAutomaticNotifications() {
+    notificationsServices.scheduleNotification();
   }
 
   Future<void> fetchUserDataFromFirestore() async {
