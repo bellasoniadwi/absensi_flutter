@@ -1,3 +1,5 @@
+import 'package:absensi_flutter/screens/formLembur.dart';
+import 'package:absensi_flutter/screens/listLemburs.dart';
 import 'package:absensi_flutter/screens/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,7 +16,7 @@ class Bottom extends StatefulWidget {
 
 class _BottomState extends State<Bottom> {
   int index_color = 0;
-  List Screen = [Home(), ProfilePage()];
+  List Screen = [Home(), FormLembur(), RiwayatLembur(), ProfilePage()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +49,31 @@ class _BottomState extends State<Bottom> {
                   color: index_color == 0 ? Color(0xFF1A73E8) : Colors.grey,
                 ),
               ),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    index_color = 1;
+                  });
+                },
+                child: Icon(
+                  Icons.edit,
+                  size: 30,
+                  color: index_color == 1 ? Color(0xFF1A73E8) : Colors.grey,
+                ),
+              ),
               SizedBox(width: 10),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    index_color = 2;
+                  });
+                },
+                child: Icon(
+                  Icons.list,
+                  size: 30,
+                  color: index_color == 2 ? Color(0xFF1A73E8) : Colors.grey,
+                ),
+              ),
               GestureDetector(
                 onTap: () async {
                   final user = FirebaseAuth.instance.currentUser;
@@ -60,7 +86,6 @@ class _BottomState extends State<Bottom> {
                           .get();
                       if (userDoc.exists) {
                         Navigator.push(
-                          // Menggunakan Navigator.push
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
@@ -87,7 +112,7 @@ class _BottomState extends State<Bottom> {
                 child: Icon(
                   Icons.person_outlined,
                   size: 30,
-                  color: index_color == 1 ? Color(0xFF1A73E8) : Colors.grey,
+                  color: index_color == 3 ? Color(0xFF1A73E8) : Colors.grey,
                 ),
               ),
             ],
