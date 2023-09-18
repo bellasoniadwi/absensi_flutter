@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:image/image.dart' as img;
+import 'package:logger/logger.dart';
 
 class AddScreen extends StatefulWidget {
   const AddScreen({super.key});
@@ -28,12 +29,14 @@ class AddScreenState extends State<AddScreen> {
   String _imagePath = '';
   bool _isSaving = false;
   bool isExist = false;
+  final logger = Logger();
 
   String? _selectedValueMasuk;
   List<String> listOfMasuk = ['Masuk', 'Izin'];
   String? _selectedValuePulang;
   List<String> listOfPulang = ['Tidak Lembur', 'Izin'];
 
+  @override
   void initState() {
     super.initState();
     fetchUserDataFromFirestore();
@@ -52,18 +55,21 @@ class AddScreenState extends State<AddScreen> {
           String email = userDoc.data()?['email'] ?? '';
           String jabatan = userDoc.data()?['jabatan'] ?? '';
           String image = userDoc.data()?['image'] ?? '';
-          String nomor_induk = userDoc.data()?['nomor_induk'] ?? '';
+          String nomorInduk = userDoc.data()?['nomor_induk'] ?? '';
           String telepon = userDoc.data()?['telepon'] ?? '';
           _nameController.text = name;
-          Provider.of<UserData>(context, listen: false).updateUserData(
-              name, email, jabatan, image, nomor_induk, telepon);
+          if (mounted) {
+            Provider.of<UserData>(context, listen: false).updateUserData(
+                name, email, jabatan, image, nomorInduk, telepon);
+          }
         }
       }
     } catch (error) {
-      print("Error fetching user data: $error");
+      logger.e("Error fetching user data: $error");
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     final currentTime = DateTime.now();
     String timePeriod;
@@ -80,9 +86,9 @@ class AddScreenState extends State<AddScreen> {
 
     Widget containerToDisplay;
     if (timePeriod == "tidak ada") {
-      containerToDisplay = main_container_noabsen();
+      containerToDisplay = mainContainerNoabsen();
     } else {
-      containerToDisplay = main_container();
+      containerToDisplay = mainContainer();
     }
 
     return Scaffold(
@@ -91,7 +97,7 @@ class AddScreenState extends State<AddScreen> {
         child: Stack(
           alignment: AlignmentDirectional.center,
           children: [
-            background_container(context),
+            backgroundContainer(context),
             Positioned(
               top: 90,
               child: containerToDisplay,
@@ -102,7 +108,7 @@ class AddScreenState extends State<AddScreen> {
     );
   }
 
-  Container main_container_noabsen() {
+  Container mainContainerNoabsen() {
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -113,7 +119,7 @@ class AddScreenState extends State<AddScreen> {
       width: 340,
       child: Column(
         children: [
-          SizedBox(height: 100),
+          const SizedBox(height: 100),
           informasi(),
         ],
       ),
@@ -129,7 +135,7 @@ class AddScreenState extends State<AddScreen> {
       ),
       width: 250,
       height: 400,
-      child: Center(
+      child: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -155,7 +161,7 @@ class AddScreenState extends State<AddScreen> {
     );
   }
 
-  Container main_container() {
+  Container mainContainer() {
     final currentTime = DateTime.now();
     String timePeriod;
 
@@ -178,15 +184,15 @@ class AddScreenState extends State<AddScreen> {
       width: 340,
       child: Column(
         children: [
-          SizedBox(height: 40),
+          const SizedBox(height: 40),
           nama(),
-          SizedBox(height: 30),
-          if (timePeriod == "datang") keterangan_datang(),
-          if (timePeriod == "pulang") keterangan_pulang(),
-          if (timePeriod == "lembur") keterangan_lembur(),
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
+          if (timePeriod == "datang") keteranganDatang(),
+          if (timePeriod == "pulang") keteranganPulang(),
+          if (timePeriod == "lembur") keteranganLembur(),
+          const SizedBox(height: 30),
           foto(),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           if (_imagePath.isNotEmpty)
             Center(
               child: Container(
@@ -200,17 +206,17 @@ class AddScreenState extends State<AddScreen> {
                     : null,
               ),
             ),
-          SizedBox(height: 30),
-          if (timePeriod == "datang") save_datang(),
-          if (timePeriod == "pulang") save_pulang(),
-          if (timePeriod == "lembur") save_lembur(),
-          SizedBox(height: 25),
+          const SizedBox(height: 30),
+          if (timePeriod == "datang") saveDatang(),
+          if (timePeriod == "pulang") savePulang(),
+          if (timePeriod == "lembur") saveLembur(),
+          const SizedBox(height: 25),
         ],
       ),
     );
   }
 
-  GestureDetector save_datang() {
+  GestureDetector saveDatang() {
     return GestureDetector(
       onTap: _isSaving
           ? null
@@ -239,11 +245,13 @@ class AddScreenState extends State<AddScreen> {
                 setState(() {
                   _isSaving = false;
                 });
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content:
-                      Text('Terdeteksi penggunaan Fake GPS pada device anda'),
-                  backgroundColor: Colors.blueAccent,
-                ));
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content:
+                        Text('Terdeteksi penggunaan Fake GPS pada device anda'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                }
                 return;
               } else {
                 latitude = _currentLocation!.latitude.toString();
@@ -254,10 +262,12 @@ class AddScreenState extends State<AddScreen> {
                 setState(() {
                   _isSaving = false;
                 });
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Upload Foto Absen Anda'),
-                  backgroundColor: Colors.blueAccent,
-                ));
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Upload Foto Absen Anda'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                }
                 return;
               }
 
@@ -267,11 +277,13 @@ class AddScreenState extends State<AddScreen> {
                   setState(() {
                     _isSaving = false;
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                        'Anda tidak dapat menambahkan data absensi karena sudah tersimpan sebelumnya'),
-                    backgroundColor: Colors.blueAccent,
-                  ));
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text(
+                          'Anda tidak dapat menambahkan data absensi karena sudah tersimpan sebelumnya'),
+                      backgroundColor: Colors.blueAccent,
+                    ));
+                  }
                   return;
                 }
                 Uint8List imageBytes = await File(_imagePath).readAsBytes();
@@ -280,13 +292,8 @@ class AddScreenState extends State<AddScreen> {
                 String formattedDateTime =
                     DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-                String fileName = 'images/' +
-                    uniqueFileName +
-                    '_' +
-                    formattedDateTime +
-                    '.jpg';
-                Reference referenceImageToUpload =
-                    FirebaseStorage.instance.ref().child(fileName);
+                String fileName = 'images/$uniqueFileName-$formattedDateTime.jpg';
+                Reference referenceImageToUpload = FirebaseStorage.instance.ref().child(fileName);
                 await referenceImageToUpload.putData(imageBytes);
 
                 String imageUrl = await referenceImageToUpload.getDownloadURL();
@@ -314,34 +321,38 @@ class AddScreenState extends State<AddScreen> {
                 _nameController.text = '';
                 _imagePath = '';
 
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Data Absensi anda berhasil tersimpan'),
-                  backgroundColor: Colors.blueAccent,
-                ));
-                Navigator.pop(context);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Data Absensi anda berhasil tersimpan'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                  Navigator.pop(context);
+                }
               } else {
                 setState(() {
                   _isSaving = false;
                 });
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Masukkan keterangan kehadiran'),
-                  backgroundColor: Colors.blueAccent,
-                ));
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Masukkan keterangan kehadiran'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                }
               }
             },
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
-          color: Color(0xFF1A73E8),
+          color: const Color(0xFF1A73E8),
         ),
         width: 120,
         height: 50,
         child: _isSaving
-            ? CircularProgressIndicator(
+            ? const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
               )
-            : Text(
+            : const Text(
                 'Simpan Data',
                 style: TextStyle(
                   fontFamily: 'f',
@@ -354,7 +365,7 @@ class AddScreenState extends State<AddScreen> {
     );
   }
 
-  GestureDetector save_pulang() {
+  GestureDetector savePulang() {
     return GestureDetector(
       onTap: _isSaving
           ? null
@@ -373,11 +384,13 @@ class AddScreenState extends State<AddScreen> {
                 setState(() {
                   _isSaving = false;
                 });
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content:
-                      Text('Terdeteksi penggunaan Fake GPS pada device anda'),
-                  backgroundColor: Colors.blueAccent,
-                ));
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content:
+                        Text('Terdeteksi penggunaan Fake GPS pada device anda'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                }
                 return;
               } else {
                 latitude = _currentLocation!.latitude.toString();
@@ -388,10 +401,12 @@ class AddScreenState extends State<AddScreen> {
                 setState(() {
                   _isSaving = false;
                 });
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Upload Foto Absen Anda'),
-                  backgroundColor: Colors.blueAccent,
-                ));
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Upload Foto Absen Anda'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                }
                 return;
               }
 
@@ -401,11 +416,13 @@ class AddScreenState extends State<AddScreen> {
                   setState(() {
                     _isSaving = false;
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                        'Anda tidak dapat menambahkan data absensi karena sudah tersimpan sebelumnya'),
-                    backgroundColor: Colors.blueAccent,
-                  ));
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text(
+                          'Anda tidak dapat menambahkan data absensi karena sudah tersimpan sebelumnya'),
+                      backgroundColor: Colors.blueAccent,
+                    ));
+                  }
                   return;
                 }
 
@@ -415,11 +432,7 @@ class AddScreenState extends State<AddScreen> {
                 String formattedDateTime =
                     DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-                String fileName = 'images/' +
-                    uniqueFileName +
-                    '_' +
-                    formattedDateTime +
-                    '.jpg';
+                String fileName = 'images/$uniqueFileName-$formattedDateTime.jpg';
                 Reference referenceImageToUpload =
                     FirebaseStorage.instance.ref().child(fileName);
                 await referenceImageToUpload.putData(imageBytes);
@@ -449,34 +462,38 @@ class AddScreenState extends State<AddScreen> {
                 _nameController.text = '';
                 _imagePath = '';
 
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Data Absensi anda berhasil tersimpan'),
-                  backgroundColor: Colors.blueAccent,
-                ));
-                Navigator.pop(context);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Data Absensi anda berhasil tersimpan'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                  Navigator.pop(context);
+                }
               } else {
                 setState(() {
                   _isSaving = false;
                 });
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Masukkan keterangan kepulangan'),
-                  backgroundColor: Colors.blueAccent,
-                ));
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Masukkan keterangan kepulangan'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                }
               }
             },
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
-          color: Color(0xFF1A73E8),
+          color: const Color(0xFF1A73E8),
         ),
         width: 120,
         height: 50,
         child: _isSaving
-            ? CircularProgressIndicator(
+            ? const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
               )
-            : Text(
+            : const Text(
                 'Simpan Data',
                 style: TextStyle(
                   fontFamily: 'f',
@@ -489,7 +506,7 @@ class AddScreenState extends State<AddScreen> {
     );
   }
 
-  GestureDetector save_lembur() {
+  GestureDetector saveLembur() {
     return GestureDetector(
       onTap: _isSaving
           ? null
@@ -507,11 +524,13 @@ class AddScreenState extends State<AddScreen> {
                 setState(() {
                   _isSaving = false;
                 });
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content:
-                      Text('Terdeteksi penggunaan Fake GPS pada device anda'),
-                  backgroundColor: Colors.blueAccent,
-                ));
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content:
+                        Text('Terdeteksi penggunaan Fake GPS pada device anda'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                }
                 return;
               } else {
                 latitude = _currentLocation!.latitude.toString();
@@ -522,10 +541,12 @@ class AddScreenState extends State<AddScreen> {
                 setState(() {
                   _isSaving = false;
                 });
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Upload Foto Absen Anda'),
-                  backgroundColor: Colors.blueAccent,
-                ));
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Upload Foto Absen Anda'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                }
                 return;
               }
 
@@ -534,11 +555,13 @@ class AddScreenState extends State<AddScreen> {
                 setState(() {
                   _isSaving = false;
                 });
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(
-                      'Anda tidak dapat menambahkan data absensi karena sudah tersimpan sebelumnya'),
-                  backgroundColor: Colors.blueAccent,
-                ));
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text(
+                        'Anda tidak dapat menambahkan data absensi karena sudah tersimpan sebelumnya'),
+                    backgroundColor: Colors.blueAccent,
+                  ));
+                }
                 return;
               }
 
@@ -548,8 +571,7 @@ class AddScreenState extends State<AddScreen> {
               String formattedDateTime =
                   DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-              String fileName =
-                  'images/' + uniqueFileName + '_' + formattedDateTime + '.jpg';
+              String fileName = 'images/$uniqueFileName-$formattedDateTime.jpg';
               Reference referenceImageToUpload =
                   FirebaseStorage.instance.ref().child(fileName);
               await referenceImageToUpload.putData(imageBytes);
@@ -578,26 +600,27 @@ class AddScreenState extends State<AddScreen> {
 
               _nameController.text = '';
               _imagePath = '';
-
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text('Data Absensi anda berhasil tersimpan'),
-                backgroundColor: Colors.blueAccent,
-              ));
-              Navigator.pop(context);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text('Data Absensi anda berhasil tersimpan'),
+                  backgroundColor: Colors.blueAccent,
+                ));
+                Navigator.pop(context);
+              }
             },
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
-          color: Color(0xFF1A73E8),
+          color: const Color(0xFF1A73E8),
         ),
         width: 120,
         height: 50,
         child: _isSaving
-            ? CircularProgressIndicator(
+            ? const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
               )
-            : Text(
+            : const Text(
                 'Simpan Data',
                 style: TextStyle(
                   fontFamily: 'f',
@@ -615,7 +638,7 @@ class AddScreenState extends State<AddScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextField(
         controller: _nameController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Nama',
           labelStyle: TextStyle(
             color: Colors.blueAccent,
@@ -623,7 +646,7 @@ class AddScreenState extends State<AddScreen> {
           ),
           border: OutlineInputBorder(),
         ),
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.blueAccent,
           fontSize: 18,
           fontFamily: "Source Sans Pro",
@@ -633,15 +656,15 @@ class AddScreenState extends State<AddScreen> {
     );
   }
 
-  Padding keterangan_lembur() {
-    TextEditingController _keteranganController = TextEditingController(
+  Padding keteranganLembur() {
+    TextEditingController keteranganController = TextEditingController(
       text: "Lembur",
     );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextField(
-        controller: _keteranganController,
-        decoration: InputDecoration(
+        controller: keteranganController,
+        decoration: const InputDecoration(
           labelText: 'Keterangan',
           labelStyle: TextStyle(
             color: Colors.blueAccent,
@@ -649,7 +672,7 @@ class AddScreenState extends State<AddScreen> {
           ),
           border: OutlineInputBorder(),
         ),
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.blueAccent,
           fontSize: 18,
           fontFamily: "Source Sans Pro",
@@ -659,35 +682,36 @@ class AddScreenState extends State<AddScreen> {
     );
   }
 
-  Padding keterangan_datang() {
+  Padding keteranganDatang() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         height: 60,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           border: Border.all(
             width: 0.5,
-            color: Color(0xffC5C5C5),
+            color: const Color(0xffC5C5C5),
           ),
         ),
         child: DropdownButton<String>(
           value: _selectedValueMasuk,
           onChanged: ((value) {
             setState(() {
-              _selectedValueMasuk = value as String?;
+              _selectedValueMasuk = value;
             });
           }),
           items: listOfMasuk
               .map((e) => DropdownMenuItem(
+                    value: e,
                     child: Container(
                       alignment: Alignment.center,
                       child: Row(
                         children: [
                           Text(
                             e,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               color: Colors.blueAccent,
                               fontFamily: "Source Sans Pro",
@@ -696,7 +720,6 @@ class AddScreenState extends State<AddScreen> {
                         ],
                       ),
                     ),
-                    value: e,
                   ))
               .toList(),
           selectedItemBuilder: (BuildContext context) => listOfMasuk
@@ -704,7 +727,7 @@ class AddScreenState extends State<AddScreen> {
                     children: [
                       Text(
                         e,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           color: Colors.blueAccent,
                           fontFamily: "Source Sans Pro",
@@ -713,8 +736,8 @@ class AddScreenState extends State<AddScreen> {
                     ],
                   ))
               .toList(),
-          hint: Padding(
-            padding: const EdgeInsets.only(left: 1),
+          hint: const Padding(
+            padding: EdgeInsets.only(left: 1),
             child: Text(
               'Pilih Keterangan',
               style: TextStyle(
@@ -732,35 +755,36 @@ class AddScreenState extends State<AddScreen> {
     );
   }
 
-  Padding keterangan_pulang() {
+  Padding keteranganPulang() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         height: 60,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           border: Border.all(
             width: 0.5,
-            color: Color(0xffC5C5C5),
+            color: const Color(0xffC5C5C5),
           ),
         ),
         child: DropdownButton<String>(
           value: _selectedValuePulang,
           onChanged: ((value) {
             setState(() {
-              _selectedValuePulang = value as String?;
+              _selectedValuePulang = value;
             });
           }),
           items: listOfPulang
               .map((e) => DropdownMenuItem(
+                    value: e,
                     child: Container(
                       alignment: Alignment.center,
                       child: Row(
                         children: [
                           Text(
                             e,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               color: Colors.blueAccent,
                               fontFamily: "Source Sans Pro",
@@ -769,7 +793,6 @@ class AddScreenState extends State<AddScreen> {
                         ],
                       ),
                     ),
-                    value: e,
                   ))
               .toList(),
           selectedItemBuilder: (BuildContext context) => listOfPulang
@@ -777,7 +800,7 @@ class AddScreenState extends State<AddScreen> {
                     children: [
                       Text(
                         e,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           color: Colors.blueAccent,
                           fontFamily: "Source Sans Pro",
@@ -786,8 +809,8 @@ class AddScreenState extends State<AddScreen> {
                     ],
                   ))
               .toList(),
-          hint: Padding(
-            padding: const EdgeInsets.only(left: 1),
+          hint: const Padding(
+            padding: EdgeInsets.only(left: 1),
             child: Text(
               'Pilih Keterangan',
               style: TextStyle(
@@ -810,10 +833,10 @@ class AddScreenState extends State<AddScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          primary: Colors.blueAccent,
+          backgroundColor: Colors.blueAccent,
           minimumSize: const Size.fromHeight(50),
           shape: RoundedRectangleBorder(
-            side: BorderSide(
+            side: const BorderSide(
               color: Colors.blueAccent,
               width: 2.0,
             ),
@@ -837,7 +860,7 @@ class AddScreenState extends State<AddScreen> {
     );
   }
 
-  Column background_container(BuildContext context) {
+  Column backgroundContainer(BuildContext context) {
     final currentTime = DateTime.now();
     String timePeriod;
 
@@ -856,7 +879,7 @@ class AddScreenState extends State<AddScreen> {
         Container(
           width: double.infinity,
           height: 240,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Color(0xFF1A73E8),
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(20),
@@ -865,9 +888,9 @@ class AddScreenState extends State<AddScreen> {
           ),
           child: Column(
             children: [
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -876,10 +899,10 @@ class AddScreenState extends State<AddScreen> {
                       onTap: () {
                         Navigator.of(context).pop();
                       },
-                      child: Icon(Icons.arrow_back, color: Colors.white),
+                      child: const Icon(Icons.arrow_back, color: Colors.white),
                     ),
                     if (timePeriod == "datang")
-                      Text(
+                      const Text(
                         'Form Absensi Datang',
                         style: TextStyle(
                             fontSize: 20,
@@ -887,7 +910,7 @@ class AddScreenState extends State<AddScreen> {
                             color: Colors.white),
                       ),
                     if (timePeriod == "pulang")
-                      Text(
+                      const Text(
                         'Form Absensi Pulang',
                         style: TextStyle(
                             fontSize: 20,
@@ -895,7 +918,7 @@ class AddScreenState extends State<AddScreen> {
                             color: Colors.white),
                       ),
                     if (timePeriod == "lembur")
-                      Text(
+                      const Text(
                         'Form Absensi Lembur',
                         style: TextStyle(
                             fontSize: 20,
@@ -903,14 +926,14 @@ class AddScreenState extends State<AddScreen> {
                             color: Colors.white),
                       ),
                     if (timePeriod == "tidak ada")
-                      Text(
+                      const Text(
                         'Absen tidak ditemukan',
                         style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
                             color: Colors.white),
                       ),
-                    Icon(
+                    const Icon(
                       Icons.attach_file_outlined,
                       color: Colors.white,
                     )
@@ -976,7 +999,7 @@ class AddScreenState extends State<AddScreen> {
     final File compressedImage = await compressImage(File(file.path), 200);
 
     setState(() {
-      _imagePath = file.path;
+      _imagePath = compressedImage.path;
     });
   }
 
@@ -1010,7 +1033,7 @@ class AddScreenState extends State<AddScreen> {
   Future<Position> _getCurrentLocation() async {
     servicePermission = await Geolocator.isLocationServiceEnabled();
     if (!servicePermission) {
-      print("Service Disabled");
+      logger.e("Service Disabled");
     }
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
