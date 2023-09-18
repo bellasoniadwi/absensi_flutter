@@ -22,7 +22,7 @@ TextField reusableTextField(
 ) {
   return TextField(
     controller: controller,
-    obscureText: isPasswordType ? !isPasswordVisible : false, // Use the passed parameter here
+    obscureText: isPasswordType ? !isPasswordVisible : false,
     enableSuggestions: !isPasswordType,
     autocorrect: !isPasswordType,
     cursorColor: Colors.white,
@@ -63,7 +63,7 @@ TextField reusableTextField(
 
 
 
-Container AuthButton(BuildContext context, bool isLogin, bool isLoading, Function onTap) {
+Container authButton(BuildContext context, bool isLogin, bool isLoading, Function onTap) {
   return Container(
     width: MediaQuery.of(context).size.width,
     height: 50,
@@ -71,15 +71,6 @@ Container AuthButton(BuildContext context, bool isLogin, bool isLoading, Functio
     decoration: BoxDecoration(borderRadius: BorderRadius.circular(90)),
     child: ElevatedButton(
       onPressed: isLoading ? null : () => onTap(),
-      child: isLoading
-          ? CircularProgressIndicator( // Show the loading indicator
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.black87),
-            )
-          : Text(
-            isLogin ? 'LOG IN' : 'SIGN UP',
-            style: const TextStyle(
-            color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16),
-            ),
             style: ButtonStyle(
           backgroundColor: MaterialStateProperty.resolveWith((states) {
             if (states.contains(MaterialState.pressed)) {
@@ -89,6 +80,15 @@ Container AuthButton(BuildContext context, bool isLogin, bool isLoading, Functio
           }),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+          child: isLoading
+          ? const CircularProgressIndicator( // Show the loading indicator
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.black87),
+            )
+          : Text(
+            isLogin ? 'LOG IN' : 'SIGN UP',
+            style: const TextStyle(
+            color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16),
+            ),
       
     ),
   );

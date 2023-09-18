@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:logger/logger.dart';
 
 class UserData extends ChangeNotifier {
   String? name;
   String? email;
   String? jabatan;
   String? image;
-  String? nomor_induk;
+  String? nomorInduk;
   String? telepon;
+  final logger = Logger();
   
 
   // Metode untuk memuat data pengguna dari Firestore berdasarkan UID
@@ -19,13 +21,13 @@ class UserData extends ChangeNotifier {
         email = userDoc.data()?['email'];
         jabatan = userDoc.data()?['jabatan'];
         image = userDoc.data()?['image'];
-        nomor_induk = userDoc.data()?['nomor_induk'];
+        nomorInduk = userDoc.data()?['nomor_induk'];
         telepon = userDoc.data()?['telepon'];
         
         notifyListeners();
       }
     } catch (error) {
-      print("Error fetching user data: $error");
+      logger.e("Error fetching user data: $error");
     }
   }
   
@@ -35,7 +37,7 @@ class UserData extends ChangeNotifier {
     email = newEmail;
     jabatan = newJabatan;
     image = newImage;
-    nomor_induk = newNomorinduk;
+    nomorInduk = newNomorinduk;
     telepon = newTelepon;
     notifyListeners();
   }

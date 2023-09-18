@@ -68,7 +68,7 @@ class _SignInScreenState extends State<SignInScreen> {
             const SizedBox(
               height: 30,
             ),
-            AuthButton(context, true, _isLoading, () async {
+            authButton(context, true, _isLoading, () async {
               setState(() {
                 _isLoading = true; 
               });
