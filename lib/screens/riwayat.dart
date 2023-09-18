@@ -137,7 +137,7 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
                                                     style: TextStyle(
                                                     fontSize: 15,
                                                     letterSpacing: 1,
-                                                    color: getStatusColor(
+                                                    color: getKeteranganColor(
                                                       documentSnapshot['keterangan'],
                                                     ),)
                                                   ),
@@ -153,7 +153,7 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
                                                     style: TextStyle(
                                                     fontSize: 15,
                                                     letterSpacing: 1,
-                                                    color: getStatusColorStatus(
+                                                    color: getStatusColor(
                                                       documentSnapshot['status'],
                                                     ),)
                                                   ),
@@ -218,11 +218,11 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
     DateTime dateTime = timestamp.toDate();
     // Format the DateTime as a human-readable string (change the format as desired)
     String formattedDateTime =
-        DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+        DateFormat('dd-MM-yyyy HH:mm:ss').format(dateTime);
     return formattedDateTime;
   }
 
-  Color getStatusColor(String keterangan) {
+  Color getKeteranganColor(String keterangan) {
     if (keterangan == 'Masuk') {
       return Colors.green;
     } else if (keterangan == 'Izin') {
@@ -232,7 +232,7 @@ class _RiwayatAbsenState extends State<RiwayatAbsen> {
     }
   }
 
-  Color getStatusColorStatus(String status) {
+  Color getStatusColor(String status) {
     if (status == 'Tepat Waktu') {
       return Colors.blue;
     } else {
