@@ -132,7 +132,7 @@ class AddScreenState extends State<AddScreen> {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: Color(0xFF1A73E8),
+        color: const Color(0xFF1A73E8),
       ),
       width: 250,
       height: 400,
@@ -196,7 +196,7 @@ class AddScreenState extends State<AddScreen> {
           const SizedBox(height: 20),
           if (_imagePath.isNotEmpty)
             Center(
-              child: Container(
+              child: SizedBox(
                 height: 250,
                 width: 170,
                 child: _imagePath != ''

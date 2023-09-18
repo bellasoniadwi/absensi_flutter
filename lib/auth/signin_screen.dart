@@ -92,7 +92,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   if (role == 'Karyawan' && isblocking == false) {
                     String jabatan = userDoc.data()?['jabatan'] ?? '';
                     String image = userDoc.data()?['image'] ?? '';
-                    String nomor_induk = userDoc.data()?['nomor_induk'] ?? '';
+                    String nomorInduk = userDoc.data()?['nomor_induk'] ?? '';
                     String telepon = userDoc.data()?['telepon'] ?? '';
                     if (mounted) {
                       Provider.of<UserData>(context, listen: false)
@@ -101,7 +101,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               userCredential.user?.email ?? "guest@example.com",
                               jabatan,
                               image,
-                              nomor_induk,
+                              nomorInduk,
                               telepon);
                     }
 

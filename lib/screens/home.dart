@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -30,9 +31,10 @@ class _HomeState extends State<Home> {
   int totalPulangBiasa = 0;
   int totalLembur = 0;
   int totalIzinPulang = 0;
-  PageController _pageController = PageController(initialPage: 0);
+  final PageController _pageController = PageController(initialPage: 0);
   bool firstPage = true;
   NotificationsServices notificationsServices = NotificationsServices();
+  final logger = Logger();
 
   @override
   void dispose() {
@@ -58,7 +60,6 @@ class _HomeState extends State<Home> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        // Ambil data pengguna dari Firestore berdasarkan UID
         var userDoc = await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
@@ -69,11 +70,12 @@ class _HomeState extends State<Home> {
           String jabatan = userDoc.data()?['jabatan'] ?? 'Jabatan';
           String image = userDoc.data()?['image'] ??
               'https://img.freepik.com/free-icon/user_318-159711.jpg';
-          String nomor_induk = userDoc.data()?['nomor_induk'] ?? 'Nomor Induk';
+          String nomorInduk = userDoc.data()?['nomor_induk'] ?? 'Nomor Induk';
           String telepon = userDoc.data()?['telepon'] ?? 'Telepon';
-
-          Provider.of<UserData>(context, listen: false).updateUserData(
-              name, email, jabatan, image, nomor_induk, telepon);
+          if (mounted) {
+            Provider.of<UserData>(context, listen: false).updateUserData(
+                name, email, jabatan, image, nomorInduk, telepon);
+          }
 
           setState(() {
             _userName = userDoc.data()?['name'] ?? 'Guest';
@@ -81,7 +83,7 @@ class _HomeState extends State<Home> {
         }
       }
     } catch (error) {
-      print("Error fetching user data: $error");
+      logger.e("Error fetching user data: $error");
     }
   }
 
@@ -142,7 +144,7 @@ class _HomeState extends State<Home> {
 
       setState(() {});
     } catch (error) {
-      print("Error fetching : $error");
+      logger.e("Error fetching : $error");
     }
   }
 
@@ -181,7 +183,7 @@ class _HomeState extends State<Home> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             'Riwayat Absensi',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
@@ -194,9 +196,9 @@ class _HomeState extends State<Home> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => RiwayatAbsen()));
+                                      builder: (context) => const RiwayatAbsen()));
                             },
-                            child: Text(
+                            child: const Text(
                               'Lihat semua',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
@@ -226,7 +228,7 @@ class _HomeState extends State<Home> {
                           ),
                           title: Text(
                             documentSnapshot['name'],
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w600,
                             ),
@@ -234,7 +236,7 @@ class _HomeState extends State<Home> {
                           subtitle: Text(
                             _getFormattedTimestamp(
                                 documentSnapshot['timestamps']),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -244,7 +246,7 @@ class _HomeState extends State<Home> {
                             children: [
                               Text(
                                 documentSnapshot['kategori'],
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16,
                                   color: Colors.black,
@@ -289,7 +291,7 @@ class _HomeState extends State<Home> {
             Container(
               width: double.infinity,
               height: 240,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.blueAccent,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(20),
@@ -306,7 +308,7 @@ class _HomeState extends State<Home> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Welcome,',
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
@@ -315,8 +317,8 @@ class _HomeState extends State<Home> {
                               ),
                             ),
                             Text(
-                              '$accountName',
-                              style: TextStyle(
+                              accountName,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 20,
                                 color: Colors.white,
@@ -336,9 +338,9 @@ class _HomeState extends State<Home> {
                               child: Container(
                                 height: 40,
                                 width: 40,
-                                color: Color.fromRGBO(250, 250, 250, 0.1),
+                                color: const Color.fromRGBO(250, 250, 250, 0.1),
                                 child: IconButton(
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.logout,
                                     color: Colors.white,
                                   ),
@@ -347,12 +349,14 @@ class _HomeState extends State<Home> {
                                     final SharedPreferences prefs =
                                         await SharedPreferences.getInstance();
                                     prefs.remove('isLoggedIn');
-                                    print("Signed Out");
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                SignInScreen()));
+                                    logger.e("Signed Out");
+                                    if (mounted) {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const SignInScreen()));
+                                    }
                                   },
                                 ),
                               ),
@@ -373,7 +377,7 @@ class _HomeState extends State<Home> {
           right: 37,
           child: Container(
             width: 320,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               boxShadow: [
                 BoxShadow(
                   color: Color.fromARGB(255, 107, 181, 242),
@@ -383,21 +387,26 @@ class _HomeState extends State<Home> {
                 ),
               ],
               color: Color(0xFF1A73E8),
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(15),
+                topRight: Radius.circular(15),
+                bottomLeft: Radius.circular(15),
+                bottomRight: Radius.circular(15),
             ),
-            child: firstPage ? rekap_datang() : rekap_pulang(),
+            ),
+            child: firstPage ? rekapDatang() : rekapPulang(),
           ),
         ),
       ],
     );
   }
 
-  Widget rekap_datang() {
+  Widget rekapDatang() {
     return Column(
       children: [
-        SizedBox(height: 10),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
+        const SizedBox(height: 10),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -412,19 +421,19 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-        SizedBox(height: 7),
+        const SizedBox(height: 7),
         Padding(
           padding: const EdgeInsets.only(left: 11, right: 11),
           child: Text(
             'Rekapitulasi Kedatangan ${DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now())}',
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.white,
             ),
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Padding(
           padding: const EdgeInsets.only(right: 15, left: 15, bottom: 20),
           child: Row(
@@ -454,12 +463,12 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget rekap_pulang() {
+  Widget rekapPulang() {
     return Column(
       children: [
-        SizedBox(height: 10),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
+        const SizedBox(height: 10),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -474,19 +483,19 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-        SizedBox(height: 7),
+        const SizedBox(height: 7),
         Padding(
           padding: const EdgeInsets.only(left: 11, right: 11),
           child: Text(
             'Rekapitulasi Kepulangan ${DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now())}',
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.white,
             ),
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Padding(
           padding: const EdgeInsets.only(right: 15, left: 15, bottom: 20),
           child: Row(
@@ -532,12 +541,12 @@ class _HomeState extends State<Home> {
                       color: Colors.white.withOpacity(0.3),
                       spreadRadius: 3,
                       blurRadius: 9,
-                      offset: Offset(0, 1),
+                      offset: const Offset(0, 1),
                     ),
                   ],
                 ),
               ),
-              Icon(
+              const Icon(
                 FontAwesomeIcons.chevronLeft,
                 color: Colors.white,
                 size: 25,
@@ -550,8 +559,8 @@ class _HomeState extends State<Home> {
             });
           },
         ),
-        SizedBox(height: 7),
-        Text(
+        const SizedBox(height: 7),
+        const Text(
           "",
           style: TextStyle(
             fontWeight: FontWeight.w500,
@@ -559,8 +568,8 @@ class _HomeState extends State<Home> {
             color: Color.fromARGB(255, 216, 216, 216),
           ),
         ),
-        SizedBox(height: 6),
-        Text(
+        const SizedBox(height: 6),
+        const Text(
           "",
           style: TextStyle(
             fontWeight: FontWeight.w600,
@@ -588,12 +597,12 @@ class _HomeState extends State<Home> {
                       color: Colors.white.withOpacity(0.3),
                       spreadRadius: 3,
                       blurRadius: 9,
-                      offset: Offset(0, 1),
+                      offset: const Offset(0, 1),
                     ),
                   ],
                 ),
               ),
-              Icon(
+              const Icon(
                 FontAwesomeIcons.chevronRight,
                 color: Colors.white,
                 size: 25,
@@ -606,8 +615,8 @@ class _HomeState extends State<Home> {
             });
           },
         ),
-        SizedBox(height: 7),
-        Text(
+        const SizedBox(height: 7),
+        const Text(
           "",
           style: TextStyle(
             fontWeight: FontWeight.w500,
@@ -615,8 +624,8 @@ class _HomeState extends State<Home> {
             color: Color.fromARGB(255, 216, 216, 216),
           ),
         ),
-        SizedBox(height: 6),
-        Text(
+        const SizedBox(height: 6),
+        const Text(
           "",
           style: TextStyle(
             fontWeight: FontWeight.w600,
@@ -636,23 +645,23 @@ class _HomeState extends State<Home> {
           backgroundColor: Colors.white,
           child: Icon(
             icon,
-            color: Color(0xFF1A73E8),
+            color: const Color(0xFF1A73E8),
             size: 18,
           ),
         ),
-        SizedBox(height: 7),
+        const SizedBox(height: 7),
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 16,
             color: Color.fromARGB(255, 216, 216, 216),
           ),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 17,
             color: Colors.white,
