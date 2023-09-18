@@ -1,4 +1,3 @@
-import 'package:absensi_flutter/widgets/bottomnavigationbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +12,6 @@ class RiwayatLembur extends StatefulWidget {
 }
 
 class _RiwayatLemburState extends State<RiwayatLembur> {
-  // Mendefinisikan variabel
   final CollectionReference _lembur =
       FirebaseFirestore.instance.collection('lemburs');
   DateTime selectedDate = DateTime.now();
@@ -184,7 +182,7 @@ class _RiwayatLemburState extends State<RiwayatLembur> {
       return 'No Timestamp';
     }
     DateTime dateTime = timestamp.toDate();
-    String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
+    String formattedDateTime = DateFormat('EEEE, d MMMM y', 'id_ID').format(dateTime);
     return formattedDateTime;
   }
 
