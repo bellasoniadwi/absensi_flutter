@@ -194,19 +194,41 @@ class AddScreenState extends State<AddScreen> {
           const SizedBox(height: 30),
           foto(),
           const SizedBox(height: 20),
-          if (_imagePath.isNotEmpty)
-            Center(
-              child: SizedBox(
-                height: 250,
-                width: 170,
-                child: _imagePath != ''
-                    ? Image.file(
-                        File(_imagePath),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  if (_imagePath.isEmpty)
+                    const Text(
+                      'Foto belum diupload',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  if (_imagePath.isNotEmpty)
+                    Center(
+                      child: SizedBox(
+                        height: 250,
+                        width: 170,
+                        child: Image.file(
+                          File(_imagePath),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  if (_imagePath.isEmpty && _isSaving)
+                    const CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+                    ),
+                ],
               ),
-            ),
+            ],
+          ),
           const SizedBox(height: 30),
           if (timePeriod == "datang") saveDatang(),
           if (timePeriod == "pulang") savePulang(),
@@ -293,8 +315,10 @@ class AddScreenState extends State<AddScreen> {
                 String formattedDateTime =
                     DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-                String fileName = 'images/$uniqueFileName-$formattedDateTime.jpg';
-                Reference referenceImageToUpload = FirebaseStorage.instance.ref().child(fileName);
+                String fileName =
+                    'images/$uniqueFileName-$formattedDateTime.jpg';
+                Reference referenceImageToUpload =
+                    FirebaseStorage.instance.ref().child(fileName);
                 await referenceImageToUpload.putData(imageBytes);
 
                 String imageUrl = await referenceImageToUpload.getDownloadURL();
@@ -327,7 +351,8 @@ class AddScreenState extends State<AddScreen> {
                     content: Text('Data Absensi anda berhasil tersimpan'),
                     backgroundColor: Colors.blueAccent,
                   ));
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Bottom()));
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const Bottom()));
                 }
               } else {
                 setState(() {
@@ -433,7 +458,8 @@ class AddScreenState extends State<AddScreen> {
                 String formattedDateTime =
                     DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-                String fileName = 'images/$uniqueFileName-$formattedDateTime.jpg';
+                String fileName =
+                    'images/$uniqueFileName-$formattedDateTime.jpg';
                 Reference referenceImageToUpload =
                     FirebaseStorage.instance.ref().child(fileName);
                 await referenceImageToUpload.putData(imageBytes);
@@ -468,7 +494,8 @@ class AddScreenState extends State<AddScreen> {
                     content: Text('Data Absensi anda berhasil tersimpan'),
                     backgroundColor: Colors.blueAccent,
                   ));
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Bottom()));
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const Bottom()));
                 }
               } else {
                 setState(() {
@@ -606,7 +633,8 @@ class AddScreenState extends State<AddScreen> {
                   content: Text('Data Absensi anda berhasil tersimpan'),
                   backgroundColor: Colors.blueAccent,
                 ));
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Bottom()));
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const Bottom()));
               }
             },
       child: Container(
