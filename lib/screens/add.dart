@@ -295,7 +295,7 @@ class AddScreenState extends State<AddScreen> {
               }
 
               if (keterangan == "Masuk" || keterangan == "Izin") {
-                bool dataExists = await checkIfDataExistsPulang(name, "Datang");
+                bool dataExists = await checkIfDataExists(name, "Datang");
                 if (dataExists) {
                   setState(() {
                     _isSaving = false;
@@ -437,7 +437,7 @@ class AddScreenState extends State<AddScreen> {
               }
 
               if (keterangan == "Tidak Lembur" || keterangan == "Izin") {
-                bool dataExists = await checkIfDataExistsPulang(name, "Pulang");
+                bool dataExists = await checkIfDataExists(name, "Pulang");
                 if (dataExists) {
                   setState(() {
                     _isSaving = false;
@@ -578,7 +578,7 @@ class AddScreenState extends State<AddScreen> {
                 return;
               }
 
-              bool dataExists = await checkIfDataExistsPulang(name, "Pulang");
+              bool dataExists = await checkIfDataExists(name, "Pulang");
               if (dataExists) {
                 setState(() {
                   _isSaving = false;
@@ -977,21 +977,7 @@ class AddScreenState extends State<AddScreen> {
   }
 
   // FUNGSI - FUNGSI
-  Future<bool> checkIfDataExistsDatang(String name, String kategori) async {
-    final DateTime now = DateTime.now();
-
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('karyawans')
-        .where('name', isEqualTo: name)
-        .where('kategori', isEqualTo: kategori)
-        .get();
-
-    isExist = checkAbsenToday(querySnapshot.docs, now.year, now.month, now.day);
-
-    return isExist;
-  }
-
-  Future<bool> checkIfDataExistsPulang(String name, String kategori) async {
+  Future<bool> checkIfDataExists(String name, String kategori) async {
     final DateTime now = DateTime.now();
 
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
